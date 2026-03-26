@@ -1,0 +1,92 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light my-5">
+  <div class="container-lg">
+    <div class="row mb-5">
+      <div class="col-12 text-center">
+        <h2 class="display-6 fw-bold">Your Cart</h2>
+      </div>
+    </div>
+    
+    <div class="row g-5">
+      <!-- Cart Items -->
+      <div class="col-lg-8">
+        {% if items %}
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                  <thead class="text-muted border-bottom">
+                    <tr>
+                      <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Product</th>
+                      <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Price</th>
+                      <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Quantity</th>
+                      <th scope="col" class="text-uppercase fw-bold text-secondary text-end" style="font-size: 0.8em;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for i in items %}
+                    <tr class="border-bottom">
+                      <td>
+                        <div class="d-flex align-items-center gap-3 py-3">
+                          <img src="{{ i.product.image.url }}" class="rounded bg-light object-fit-cover shadow-sm" width="80" height="80" alt="{{ i.product.name }}">
+                          <div>
+                            <h6 class="mb-0 fw-bold">{{ i.product.name }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fw-semibold text-muted">${{ i.product.price }}</td>
+                      <td>
+                        <div class="input-group input-group-sm" style="width: 120px;">
+                          <a href="{% url 'decrease_quantity' i.id %}" class="btn btn-outline-secondary px-3">-</a>
+                          <input type="text" class="form-control text-center bg-white" value="{{ i.quantity }}" readonly>
+                          <a href="{% url 'increase_quantity' i.id %}" class="btn btn-outline-secondary px-3">+</a>
+                        </div>
+                      </td>
+                      <td class="text-end fw-bold text-black">${{ i.total }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="card shadow-sm border-0 rounded-4 py-5 text-center">
+            <div class="card-body">
+              <h4 class="text-muted fw-normal mb-4">Your cart is currently empty.</h4>
+              <a href="{% url 'userhome' %}" class="btn btn-black btn-medium text-uppercase hvr-sweep-to-right px-4 py-3" style="color: white !important;">Continue Shopping</a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Order Summary -->
+      {% if items %}
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0 rounded-4 bg-white">
+          <div class="card-body p-5">
+            <h4 class="fw-bold mb-4 border-bottom pb-3">Order Summary</h4>
+            <div class="d-flex justify-content-between mb-4">
+              <span class="text-muted fs-5">Grand Total</span>
+              <span class="fw-bold fs-4 text-black">${{ grand_total }}</span>
+            </div>
+            <a href="{% url 'checkout' %}" class="btn btn-black w-100 text-uppercase hvr-sweep-to-right py-3 mb-3" style="color: white !important;">Proceed to Checkout</a>
+            <a href="{% url 'userhome' %}" class="btn btn-outline-gray w-100 text-uppercase py-3">Continue Shopping</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+    </div>
+  </div>
+</section>
+
+{% if messages %}
+  {% for msg in messages %}
+  <script>alert('{{msg}}')</script>
+  {% endfor %}
+{% endif %}
+{% endblock %}

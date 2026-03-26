@@ -1,0 +1,70 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light my-5">
+  <div class="container-lg">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold mb-0">Order Details <span class="text-muted fw-normal fs-5">#{{ order.id }}</span></h4>
+            <span class="badge bg-dark text-white rounded-pill px-3 py-2 text-uppercase">{{ order.orderstatus|default:"Processed" }}</span>
+          </div>
+          <div class="card-body p-5">
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded h-100">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Order Date</span>
+                  <span class="fs-6 fw-semibold text-dark">{{ order.orderdate }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded h-100">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Est. Delivery Date</span>
+                  <span class="fs-6 fw-semibold text-dark">{{ order.deliverydate|default:"TBD" }}</span>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded h-100">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Payment Status</span>
+                  <span class="fs-6 fw-semibold text-dark">{{ order.paymentstatus|default:"Pending" }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded h-100">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Payment Method</span>
+                  <span class="fs-6 fw-semibold text-dark">{{ order.payment_method|default:"N/A" }}</span>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded h-100">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Tracking ID</span>
+                  <span class="fs-6 fw-semibold text-dark">{{ order.tracking_id|default:"Not Yet Dispatched" }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded h-100">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Carrier</span>
+                  <span class="fs-6 fw-semibold text-dark">{{ order.carrier|default:"N/A" }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-top pt-4 mt-2 d-flex justify-content-between align-items-center">
+              <span class="text-uppercase fw-bold text-muted">Total Amount</span>
+              <span class="display-6 fw-bold text-black">${{ order.total_amount }}</span>
+            </div>
+            
+            <div class="mt-5 text-center">
+              <a href="{% url 'vieworder' %}" class="btn btn-outline-gray text-uppercase px-5 py-3 rounded-pill border border-2">Back to Orders</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

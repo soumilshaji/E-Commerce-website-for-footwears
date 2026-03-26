@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - UrbanSole</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #000000;
+            --primary-hover: #333333;
+            --background: #f4f5f7;
+            --surface: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-muted: #6c757d;
+            --border-color: #eaeaea;
+            --success: #28a745;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--surface);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .nav-item:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* Checkout Container */
+        .checkout-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Cart Items */
+        .cart-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .item-image {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .item-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+
+        .item-meta {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0 0 10px 0;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Order Summary */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--border-color);
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Payment Buttons */
+        .payment-options {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-cod {
+            background-color: var(--surface);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-cod:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .btn-upi {
+            background-color: var(--primary-color);
+            box-sizing: border-box;
+            color: white;
+        }
+
+        .btn-upi:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px;
+            }
+            .nav-links {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="{% url 'userhome' %}" class="navbar-brand">UrbanSole</a>
+        <div class="nav-links">
+            <a href="{% url 'cartitems' %}" class="nav-item">🛒 Cart</a>
+            <a href="{% url 'vieworder' %}" class="nav-item">📦 Orders</a>
+            <a href="{% url 'wishlistview' %}" class="nav-item">❤️ Wishlist</a>
+            <a href="{% url 'userdetails' %}" class="nav-item">👤 Profile</a>
+            <a href="{% url 'logout' %}" class="nav-item logout" style="background-color: #dc3545; color: white;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="checkout-container">
+        <!-- Left Column: Order Details -->
+        <div class="checkout-main">
+            <a href="{% url 'cartitems' %}" class="back-link">← Back to Cart</a>
+            
+            <h2 class="section-title">Review Your Order</h2>
+            
+            <div class="card">
+                <div class="cart-items-list">
+                    {% for i in items %}
+                    <div class="cart-item">
+                        {% if i.product.image %}
+                        <img src="{{ i.product.image.url }}" alt="{{ i.product.name }}" class="item-image">
+                        {% else %}
+                        <div class="item-image" style="display: flex; align-items: center; justify-content: center; font-size: 12px; color: #999;">No Image</div>
+                        {% endif %}
+                        
+                        <div class="item-details">
+                            <h3 class="item-name">{{ i.product.name }}</h3>
+                            <p class="item-meta">Qty: {{ i.quantity }} × ₹{{ i.product.price }}</p>
+                            <div class="item-price">₹{{ i.total|default:i.product.price }}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        Your cart is empty.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Summary & Payment -->
+        <div class="checkout-sidebar">
+            <h2 class="section-title">Order Summary</h2>
+            
+            <div class="card" style="position: sticky; top: 100px;">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{{ grand_total }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span style="color: var(--success); font-weight: 600;">Free</span>
+                </div>
+                
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>₹{{ grand_total }}</span>
+                </div>
+
+                <div class="payment-options">
+                    <form action="{% url 'cash_on_delivery' %}" method="post" style="width: 100%; margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-cod">
+                            💵 Cash on Delivery
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'upi' %}" class="btn btn-upi">
+                        💳 Pay with UPI / Card
+                    </a>
+                </div>
+                
+                <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 20px; line-height: 1.5;">
+                    By confirming this order, you agree to UrbanSole's Conditions of Use and Privacy Notice.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

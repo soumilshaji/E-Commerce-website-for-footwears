@@ -1,0 +1,42 @@
+<!-- done -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% for k in pdata %} 
+     <form action="{% url 'edit_product' k.id  %}" enctype="multipart/form-data" method="post">
+        {% csrf_token  %}
+<label>Product Photo</label><br>
+
+{% if k.image %}
+<img src="{{k.image.url}}" width="150"><br>
+{% endif %}
+
+<input type="file" name="image"><br>
+        <label for="">Name</label>
+        <input type="text" name="Name" value="{{k.Name}}"><br>
+        <label for="">Price</label>
+        <input type="text"  name="price" value="{{k.Price}}"> <br>
+        <label for="">stock</label>
+        <input type="number" name="stock" value="{{k.stock}}"><br>
+        <label for="">category</label>
+        <select name="category" id="">
+            <option value="{{k.category_id}}">{{k.category.Name}}</option>
+            {% for i in c  %}
+            <option value="{{i.id}}">{{i.Name}}</option>
+            {% endfor %}
+        </select><br>
+        <label for="">description</label><br>
+        <textarea name="description" rows="4" cols="40">{{k.Description}}</textarea><br>
+        <input type="submit">
+    </form>
+    {% endfor %}
+
+
+
+</body>
+</html>

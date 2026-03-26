@@ -1,0 +1,46 @@
+<!-- done -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+        <form action="{% url 'edituser'  %}" enctype="multipart/form-data" method="post">
+        {% csrf_token  %}
+        
+        <label>Profile Photo</label>
+        {% if user_details.profilephoto %}
+        <img src="{{ user_details.profilephoto.url }}" width="120"><br>
+        {% endif %}
+        <input type="file" name="profilephoto"><br><br>
+        
+        <label for="">FirstName</label>
+        <input type="text" name="first_name" id="first_name" value="{{ user_details.user.first_name }}"><br>
+        <label for="">LastName</label>
+        <input type="text"  name="last_name" value="{{ user_details.user.last_name }}"> <br>
+        <label for="">username</label>
+        <input type="text" name="username" value="{{ user_details.user.username }}"><br>
+        <label for="">email</label>
+        <input type="email" name="email" value="{{ user_details.user.email }}"><br>
+        <label for="">password</label>
+        <input type="password" name="password" value="{{ request.user.password }}"><br>
+        <label for="">address</label>
+        <textarea name="address"  rows="4" cols="40" >{{ user_details.address }}</textarea><br>
+        <label for="">City</label>
+        <input type="text" name="city" value="{{ user_details.city }}"><br>
+        <label for="">state</label>
+        <input type="text" name="state" value="{{ user_details.state }}"><br>
+        <label for="">phone</label>
+        <input type="text" name="phone" value="{{ user_details.phonenumber }}"><br>
+        <label for="">postal_code</label>
+        <input type="text" name="postal_code" value="{{ user_details.postal_code}}"><br>
+        <input type="submit">
+    </form>
+
+
+
+
+</body>
+</html>

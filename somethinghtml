@@ -1,0 +1,114 @@
+<!-- done -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>USER HOME</h1>
+    <h2>PRODUCTS</h2>
+    <button><a href="{% url 'cartitems' %}">ViewCart</a></button><br>
+    <button><a href="{% url 'vieworder' %}">ViewOrder</a></button><br>
+    <button><a href="{% url 'userdetails' %}">User Details</a></button>
+   <br><button><a href="{% url 'logout' %}">logout</a></button>
+
+<div class="container">
+
+{% for i in data %}
+
+<div class="card">
+
+{% if i.image %}
+<img src="{{ i.image.url }}" width="150">
+{% else %}
+<p>No Image</p>
+{% endif %}
+
+<h3>{{ i.name }}</h3>
+<p>Price: {{ i.price }}</p>
+<a href="{% url 'productdetails' i.id %}">Details</a><br>
+</div>
+
+{% empty %}
+
+<h2>No Products Available</h2>
+
+{% endfor %}
+
+</div>
+    
+
+<br><a href="{% url 'logout' %}">logout</a>
+
+
+        <!-- image,name,price, -->
+
+</body>
+</html>
+
+
+
+<!-- done -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>View Orders</h2>
+<div class="card">
+{% for i in orders %}
+
+<img src="{{ i.product.image.url }}" width="120">
+
+<h3>{{ i.product.name }}</h3>
+<p>Price: {{ i.product.price }}</p>
+<p>Quantity: {{ i.quantity }}</p>
+<p>Total: {{ i.total }}</p>
+
+
+<a href="{% url 'orderdetails' i.order.id %}">View Details</a><br>
+{% endfor %}
+</div>
+<h2>GrandTotal: {{grand_total}}</h2><br>
+
+
+<a href="{% url 'cartitems' %}">Back</a>
+
+</body>
+</html>
+
+
+<!-- done -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>User Details</h2>
+{% if user_details.profile_photo %}
+<!-- <img src="{{ user_details.profile_photo.url }}" width="150"> -->
+{% endif %}
+<p><b>Firstname:</b> {{ request.user.first_name }}</p>
+<p><b>Lastname:</b> {{ request.user.last_name }}</p>
+<p><b>Username:</b> {{ request.user.username }}</p>
+<p><b>Email:</b> {{ request.user.email }}</p>
+<p><b>Phone:</b> {{ user_details.phone }}</p>
+<p><b>Address:</b> {{ user_details.address }}</p>
+<p><b>City:</b> {{ user_details.city }}</p>
+<p><b>State:</b> {{ user_details.state }}</p>
+<p><b>Postal Code:</b> {{ user_details.postal_code }}</p>
+
+
+<br><br>
+<a href="{% url 'edituser' %}">Edit</a><br>
+<a href="{% url 'userhome' %}">Back</a>
+</body>
+</html>

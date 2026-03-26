@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("{% static 'stylish-1.0.0/images/card-image1.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-container h1 {
+            margin-bottom: 30px;
+            font-size: 32px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .admin-link {
+            display: inline-block;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .admin-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-link {
+            background: rgba(220, 53, 69, 0.6);
+            margin-top: 30px;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            border-color: rgba(220, 53, 69, 0.8);
+        }
+
+        .logout-link:hover {
+            background: rgba(220, 53, 69, 0.9);
+        }
+        
+        @media (max-width: 600px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-link[style*="grid-column: 1 / -1;"] {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1>Admin Dashboard</h1>
+        
+        <div class="button-grid">
+            <a href="{% url 'category' %}" class="admin-link">Add Category</a>
+            <a href="{% url 'view' %}" class="admin-link">View Categories</a>
+            <a href="{% url 'add_product' %}" class="admin-link">Add Product</a>
+            <a href="{% url 'view_product' %}" class="admin-link">View Products</a>
+            <a href="{% url 'userorder_for_admin' %}" class="admin-link" style="grid-column: 1 / -1;">Orders</a>
+        </div>
+        
+        <a href="{% url 'logout' %}" class="admin-link logout-link">Logout</a>
+    </div>
+
+</body>
+</html>

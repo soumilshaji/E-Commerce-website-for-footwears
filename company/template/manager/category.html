@@ -1,0 +1,25 @@
+<!-- done -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+         <form action="{% url 'category' %}" method="post">
+        {% csrf_token  %}
+        <label for="">Name</label>
+        <input type="text" name="name"><br>
+        <label for="">Description</label><br>
+        <textarea name="description" rows="4" cols="40"></textarea><br>
+        <input type="submit">
+
+     {% if messages %}
+    {% for msg in messages  %}
+    <script>alert('{{msg}}')</script>
+    {% endfor %}
+    {% endif %}
+    </form>
+</body>
+</html>

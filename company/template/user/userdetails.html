@@ -1,0 +1,72 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light my-5">
+  <div class="container-lg">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-5">
+            <div class="text-center mb-5">
+              {% if user_details.profilephoto %}
+              <img src="{{ user_details.profilephoto.url }}" class="rounded-circle mb-3 shadow" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #fff;" alt="Profile Photo">
+              {% else %}
+              <div class="rounded-circle mb-3 shadow bg-secondary d-inline-flex justify-content-center align-items-center text-white" style="width: 150px; height: 150px; border: 4px solid #fff; font-size: 3rem;">
+                {{ request.user.first_name|first|default:request.user.username|first|upper }}
+              </div>
+              {% endif %}
+              <h2 class="fw-bold mb-1">{{ request.user.first_name }} {{ request.user.last_name }}</h2>
+              <p class="text-muted fs-5">{{ request.user.username }}</p>
+            </div>
+
+            <div class="row g-4 mb-5">
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Email</span>
+                  <span class="fs-6 text-dark">{{ request.user.email }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Phone Number</span>
+                  <span class="fs-6 text-dark">{{ user_details.phonenumber|default:"N/A" }}</span>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="p-3 bg-light rounded">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Address</span>
+                  <span class="fs-6 text-dark">{{ user_details.address|default:"N/A" }}</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">City</span>
+                  <span class="fs-6 text-dark">{{ user_details.city|default:"N/A" }}</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">State</span>
+                  <span class="fs-6 text-dark">{{ user_details.state|default:"N/A" }}</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Postal Code</span>
+                  <span class="fs-6 text-dark">{{ user_details.postal_code|default:"N/A" }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3 mt-4">
+              <a href="{% url 'edituser' %}" class="btn btn-black btn-medium text-uppercase hvr-sweep-to-right px-4 py-3" style="color: white !important;">Edit Profile</a>
+              <a href="{% url 'userhome' %}" class="btn btn-outline-gray text-uppercase px-4 py-3">Back to Home</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .auth-wrapper {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+        url("{% static 'stylish-1.0.0/images/hangingshoes.jpg' %}") no-repeat center center;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 40px 0;
+    }
+
+    .login-box {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 400px;
+        box-sizing: border-box;
+        margin: auto;
+    }
+
+    .login-box h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .input-group {
+        margin: 15px 0;
+        position: relative;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        padding-right: 40px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .eye {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        cursor: pointer;
+    }
+
+    .login-btn-submit {
+        width: 100%;
+        padding: 10px;
+        background: blue;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="login-box">
+        <h2>Login</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Enter Username" required>
+            </div>
+
+            <!-- Password -->
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                <span class="eye" onclick="togglePassword()">👁️</span>
+            </div>
+
+            <!-- Button -->
+            <button type="submit" class="login-btn-submit">Login</button>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="margin-bottom: 10px;">Don't have an account?</p>
+                <a href="{% url 'form' %}">
+                    <button type="button" style="background: #28a745; width: 100%; padding: 10px; color: white; border: none; border-radius: 5px;">Register</button>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        var pass = document.getElementById("password");
+        if (pass.type === "password") {
+            pass.type = "text";
+        } else {
+            pass.type = "password";
+        }
+    }
+</script>
+{% endblock %}

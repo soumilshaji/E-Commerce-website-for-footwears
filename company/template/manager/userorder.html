@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .table-container h2 {
+            margin-bottom: 25px;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #e9ecef;
+            color: #333;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background: #d3d9df;
+        }
+
+        .filter-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-link {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 0 4px;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .btn-details { background-color: #17a2b8; }
+        .btn-details:hover { background-color: #138496; }
+
+        .btn-cancel { background-color: #dc3545; }
+        .btn-cancel:hover { background-color: #c82333; }
+
+        .btn-complete { background-color: #28a745; }
+        .btn-complete:hover { background-color: #218838; }
+
+        .status-text {
+            font-weight: bold;
+            color: #6c757d;
+            text-transform: capitalize;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: background 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="table-container">
+        <h2>User Orders</h2>
+
+        <div class="filter-group">
+            <a href="?status=pending" class="filter-btn">Pending</a>
+            <a href="?status=Processing" class="filter-btn">Processing</a>
+            <a href="?status=Completed" class="filter-btn">Completed</a>
+            <a href="?status=Canceled" class="filter-btn">Cancelled</a>
+            <a href="?status=all" class="filter-btn">All Orders</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Amount</th>
+                    <th style="text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in orders %}
+                <tr>
+                    <td>{{ item.user.username }}</td>
+                    <td>{{ item.orderdate }}</td>
+                    <td class="status-text">{{ item.orderstatus }}</td>
+                    <td>{{ item.payment_method }}</td>
+                    <td>${{ item.total_amount }}</td>
+                    <td style="text-align: center;">
+                        {% if item.orderstatus == 'pending' %}
+                            <a href="{% url 'orderdetails_for_manager' item.id %}" class="action-link btn-details">More Details</a>
+                        {% elif item.orderstatus == 'Processing' %}
+                            <a href="{% url 'canceled_order' item.id %}" class="action-link btn-cancel" onclick="return confirm('Cancel this order?')">Cancel</a>
+                            <a href="{% url 'completeorder' item.id %}" class="action-link btn-complete" onclick="return confirm('Mark as complete?')">Complete</a>
+                        {% else %}
+                            <span class="status-text">{{ item.orderstatus }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <a href="{% url 'adminhome' %}" class="btn-back">&larr; Back to Admin Home</a>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let status = urlParams.get('status') || 'all';
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.href.includes(status)) {
+                    btn.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

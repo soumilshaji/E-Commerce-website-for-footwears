@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Order Details</h2>
+{% for item in order.orderitem_set.all %}
+<img src="{{ item.product.image.url }}" width="150">
+
+<p><b>Product:</b> {{ item.product.name }}</p>
+
+<p><b>Price:</b> {{ item.product.price }}</p>
+<p><b>quantity:</b> {{ item.quantity }}</p>
+
+{% endfor %}
+<p><b>Username:</b> {{ order.user.username }}</p>
+<p><b>Email:</b> {{ order.user.email }}</p>
+
+
+<p><b>OrderID:</b> {{ order.id }}</p>
+
+<p><b>OrderDate:</b> {{ order.orderdate }}</p>
+<p><b>OrderStatus:</b> {{ order.orderstatus }}</p>
+
+<p><b>Phone:</b> {{ u.phonenumber }}</p>
+<p><b>Address:</b> {{ u.address }}</p>
+<p><b>City:</b> {{ u.city }}</p>
+<p><b>State:</b> {{ u.state }}</p>
+<p><b>Postal Code:</b> {{ u.postal_code }}</p>
+
+<p><b>Paymentmethod:</b> {{ order.payment_method }}</p>
+<p><b>paymentstatus:</b> {{ order.paymentstatus }}</p>
+<p><b>TotalAmount:</b> {{ order.total_amount }}</p>
+
+
+<br>
+<form method="post"  action="{% url 'orderdetails_for_manager' order.id %}" >
+    {% csrf_token %}
+<label for="">TrackingID</label>
+<input type="text" name="TrackingID" value="{{order.trackingid}}">
+
+<label for="">Carrier</label>
+<input type="text" name="CARRIER" value="{{order.carrier}}">
+
+<label for="">Delivery Date</label>
+<input type="date" name="DELIVERY_DATE" value="{{order.deliverydate}}"><br>
+
+<input type="submit" name="cancel_order" value="Cancel">
+<input type="submit" name="start_processing">
+
+</form>
+<!-- <button><a href="">TrackingID</a></button>
+<button><a href="">Carrier</a></button>
+<button><a href="">DeliveryDate</a></button><br> -->
+
+<br><a href="{% url 'userorder_for_admin' %}">Back</a>
+</body>
+</html>
