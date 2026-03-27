@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-qc$a0d72!s9%7c2_kd1f8bau4-0x$c)))zr*f1#b*@8rvs#0rv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'company.urls'
@@ -120,20 +121,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
 STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
 
 load_dotenv()
 
 SECRET_KEY=os.getenv('SECRET_KEY')
-EMAIL_HOST_PASSWORD=os.getenv('SECRET_KEY')
-STRIPE_SECRET_KEY=os.getenv('SECRET_KEY')
-EMAIL_HOST_USER=os.getenv('SECRET_KEY')
-DEBUG = os.getenv('SECRET_KEY') == 'TRUE'
+EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
+STRIPE_SECRET_KEY=os.getenv('STRIPE_SECRET_KEY')
+EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
+DEBUG = os.getenv('DEBUG',False).lower == 'true'
 
+# git add .
+
+# git git remote add origin https://github.com/soumilshaji/E-Commerce-website-for-footwears.git
+
+# git commit -m "staticfiles"
+# git branch -M main  
+# git pull
 
 # kgwp qjcd kbod hina
 

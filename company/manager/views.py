@@ -87,7 +87,7 @@ def edit_product(request, id):
         s.stock = request.POST['stock']
         s.category_id=request.POST['category']
         if 'image' in request.FILES:
-            s.image = request.FILES['image']
+            s.image = request.FILES.get('image')
         s.save()
     editproduct=Product.objects.filter(id=id)
     return render(request, 'manager/edit_product.html', {'pdata': editproduct,'c':c})
