@@ -1,0 +1,713 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+    <style>
+        :root {
+            --brand-orange: #F77F00;
+            --brand-light-orange: #fff5ed;
+            --surface: #ffffff;
+            --text-dark: #003049;
+            --text-muted: #757575;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        body {
+            background-color: #fcfcfc;
+            color: var(--text-dark);
+        }
+
+        /* Hero Banner for Special Collection */
+        .special-hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("{% static 'firstpage/special_category_bg.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            height: 50vh; /* Full Viewport Height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+            animation: heroReveal 1.5s ease-out;
+        }
+
+        @keyframes heroReveal {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .scroll-down-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+            40% {transform: translateY(-10px) translateX(-50%);}
+            60% {transform: translateY(-5px) translateX(-50%);}
+        }
+
+        .special-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: var(--brand-orange);
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: 1;
+        }
+
+        .special-title {
+            font-size: 4.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+            display: inline-block;
+            background-color: white; /* Clean White Block */
+            color: black; /* High Contrast Black Text */
+            padding: 5px 40px;
+            transform: skewX(-10deg); /* Aggressive sports tilt */
+            box-shadow: 10px 10px 0px var(--brand-orange); /* Contrast accent */
+        }
+
+        .special-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Search & Filter Section (Simplified) */
+        .search-section {
+            background-color: transparent;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-form {
+            display: flex;
+            background-color: white;
+            padding: 8px;
+            border-radius: 50px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            background-color: var(--brand-orange);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background-color: #a04101;
+            transform: translateY(-2px);
+        }
+
+        /* Sort & Meta Bar */
+        .meta-bar {
+            background: white;
+            padding: 20px 0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 30px;
+        }
+
+        .meta-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-count {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sort-select {
+            border: 1px solid #eee;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            background: #f9f9f9;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .sort-select:focus {
+            border-color: var(--brand-orange);
+            background: white;
+        }
+
+        /* Stats in Hero */
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--brand-orange);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 5px;
+        }
+
+        /* Re-using styles from userhome for consistency */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 40px 30px;
+            padding: 40px 0;
+        }
+
+        .product-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .product-image-container {
+            background-color: #f7f7f7;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .product-image-container:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+        }
+
+        .product-image {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            transition: transform 0.4s ease;
+        }
+
+        .product-item:hover .product-image { transform: scale(1.05); }
+
+        .sale-banner {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--brand-red);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .product-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .product-price-layout {
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-price { color: var(--brand-red); font-weight: 600; }
+        .original-price { color: #888; text-decoration: line-through; font-size: 0.9em; }
+
+        .heart-icon-minimal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.5rem;
+            z-index: 5;
+            text-decoration: none;
+        }
+
+        /* Enable and style the slidebox specifically for this page */
+        .product-image-container {
+            background-color: #f7f7f7;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        /* Pagination matching screenshot */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 60px 0;
+        }
+
+        .page-circle {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: white;
+            color: #555;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            transition: all 0.2s ease;
+        }
+
+        .page-circle.active { background-color: var(--brand-navy); color: white; border-color: var(--brand-navy); }
+        .page-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            padding: 0 20px;
+            border-radius: 20px;
+            background-color: var(--brand-navy);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Brand Roller Section */
+        .brand-roller-container {
+            padding: 40px 0;
+            overflow: hidden;
+            background: #ffffff;
+            position: relative;
+            border-bottom: 1px solid #eee;
+        }
+        .brand-wrapper {
+            display: flex; gap: 40px; overflow-x: auto;
+            padding: 40px 45%; scrollbar-width: none;
+            -ms-overflow-style: none; scroll-snap-type: x mandatory;
+            align-items: center;
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        }
+        .brand-wrapper::-webkit-scrollbar { display: none; }
+        .brand-item {
+            flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 15px;
+            text-decoration: none; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; scroll-snap-align: center; opacity: 0.4; transform: scale(0.85); filter: grayscale(100%);
+        }
+        .brand-item.active-focus {
+            opacity: 1; transform: scale(1.4) translateY(-10px); filter: grayscale(0%); z-index: 10;
+        }
+        .brand-circle {
+            width: 80px; height: 80px; border-radius: 20px; background: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #eee; transition: all 0.5s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .brand-item.active-focus .brand-circle {
+            border-color: var(--brand-orange);
+            box-shadow: 0 20px 40px rgba(192, 78, 1, 0.2);
+            background: white;
+        }
+        .brand-item:not(.active-focus) svg {
+            stroke: var(--text-muted);
+        }
+        .brand-item.active-focus svg {
+            stroke: var(--brand-orange);
+        }
+        .brand-name {
+            font-size: 0.75rem; font-weight: 800; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s ease;
+        }
+        .brand-item.active-focus .brand-name { color: var(--brand-orange); transform: translateY(5px); }
+    </style>
+
+    <!-- Special Hero Banner -->
+    <div class="special-hero">
+        <div class="container text-center">
+            <span class="badge mb-3" style="background: var(--brand-orange); letter-spacing: 2px;">PREMIUM COLLECTION</span>
+            <h1 class="special-title">Athletic & Indoor</h1>
+            <p class="special-subtitle">Elite performance footwear for the court and the track. Engineered for speed, comfort, and control.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-value">{{ page_obj.paginator.count }}</span>
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-item border-start border-end border-white-50 px-5">
+                    <span class="stat-value">Free</span>
+                    <span class="stat-label">Shipping</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">24/7</span>
+                    <span class="stat-label">Support</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-down-indicator">
+            <span class="d-block mb-1">Explore</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+
+    <!-- Category Roller Section -->
+    <div class="brand-roller-container" id="shop-content">
+        <div class="container-lg">
+            <div class="brand-wrapper">
+                <a href="?search=Gym,Running" class="brand-item" data-brand="Gym,Running" data-bg-color="transparent" data-bg-url="{% static 'firstpage/special_category_bg.jpg' %}" data-hero-title="GYM & RUNNING" data-hero-badge="PERFORMANCE" data-hero-subtitle="Maximum stability for lifting and explosive sprints for endurance.">
+                    <div class="brand-circle">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="brand-svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17H2c0-1.1.9-2 2-2h4l4-8h4l2 4h4v6z"/><path d="M10 21v-4"/></svg>
+                    </div>
+                    <span class="brand-name">Gym & Running</span>
+                </a>
+                <a href="?search=Badminton" class="brand-item" data-brand="Badminton" data-bg-color="transparent" data-bg-url="{% static 'firstpage/special_category_bg.jpg' %}" data-hero-title="BADMINTON" data-hero-badge="AGILITY" data-hero-subtitle="Lightweight agility and perfect court grip mapping.">
+                    <div class="brand-circle">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="brand-svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-4-6-4-10c0-2.2 1.8-4 4-4s4 1.8 4 4c0 4-4 10-4 10z"/><polyline points="8 12 16 12"/><polyline points="9.5 8.5 14.5 8.5"/></svg>
+                    </div>
+                    <span class="brand-name">Badminton</span>
+                </a>
+                
+                <!-- All Products option (Symmetrical Center) -->
+                <a href="?search=" class="brand-item" data-brand="ALL" data-bg-color="transparent" data-bg-url="{% static 'firstpage/special_category_bg.jpg' %}" data-hero-title="ATHLETIC & INDOOR" data-hero-badge="PREMIUM COLLECTION" data-hero-subtitle="Elite performance footwear for the court and the track.">
+                    <div class="brand-circle">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--brand-orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </div>
+                    <span class="brand-name">ALL</span>
+                </a>
+
+                <a href="?search=Basketball" class="brand-item" data-brand="Basketball" data-bg-color="transparent" data-bg-url="{% static 'firstpage/special_category_bg.jpg' %}" data-hero-title="BASKETBALL" data-hero-badge="HOOPS" data-hero-subtitle="Superior ankle support and impact protection.">
+                    <div class="brand-circle">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="brand-svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/><path d="M12 2a15.3 15.3 0 0 0-4 10 15.3 15.3 0 0 0 4 10"/></svg>
+                    </div>
+                    <span class="brand-name">Basketball</span>
+                </a>
+                <a href="?search=Cricket" class="brand-item" data-brand="Cricket" data-bg-color="transparent" data-bg-url="{% static 'firstpage/special_category_bg.jpg' %}" data-hero-title="CRICKET" data-hero-badge="FIELD" data-hero-subtitle="Professional grip and traction for optimal performance on the pitch.">
+                    <div class="brand-circle">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="brand-svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 2L6 14l2 2 12-12-2-2zM4 22l6-6-2-2-6 6 2 2zM15 5l2 2M13 7l2 2M11 9l2 2"/>
+                            <circle cx="20" cy="20" r="2"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">Cricket</span>
+                </a>
+                <a href="?search=Soccer" class="brand-item" data-brand="Soccer" data-bg-color="transparent" data-bg-url="{% static 'firstpage/special_category_bg.jpg' %}" data-hero-title="SOCCER" data-hero-badge="FIELD" data-hero-subtitle="Precision touch and explosive traction layout.">
+                    <div class="brand-circle">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="brand-svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 7l-4 3 1.5 5h5L16 10zM12 7V2M8 10l-6-2M16 10l6-2M13.5 15l3.5 5.5M10.5 15L7 20.5"/></svg>
+                    </div>
+                    <span class="brand-name">Soccer</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Section -->
+    <div class="search-section">
+        <div class="container">
+            <div class="search-container">
+                <form method="GET" class="search-form" id="filter-form">
+                    <!-- Preserve sort value in search form -->
+                    <input type="hidden" name="sort" value="{{ request.GET.sort|default:'newest' }}">
+                    <input type="text" name="search" class="search-input" value="{{ request.GET.search|default:'' }}" placeholder="Search in this collection...">
+                    <button type="submit" class="search-btn">Filter</button>
+                    <a href="{% url 'userhome' %}" class="btn ms-2 d-none d-md-flex align-items-center" style="color: #666; font-size: 0.9rem;">View All Categories</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meta Bar (Count & Sort) -->
+    <div class="meta-bar">
+        <div class="container">
+            <div class="meta-content">
+                <div class="product-count">
+                    Showing <strong>{{ page_obj.start_index }}-{{ page_obj.end_index }}</strong> of {{ page_obj.paginator.count }} products
+                </div>
+                <div class="sort-wrapper">
+                    <select class="sort-select" onchange="applySort(this.value)">
+                        <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Grid Section -->
+    <div class="container-lg" id="dynamic-product-grid" style="margin-top: 40px;">
+        {% include 'user/product_grid.html' %}
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productGrid = document.querySelector('#dynamic-product-grid');
+    const wrapper = document.querySelector('.brand-wrapper');
+    const items = document.querySelectorAll('.brand-item');
+    
+    let debounceTimer;
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentBrand = urlParams.get('search') || 'ALL';
+
+    if (wrapper && items.length > 0) {
+        const fetchProducts = (brandName) => {
+            const urlSearch = brandName === 'ALL' ? '' : brandName;
+            
+            if (currentBrand === brandName) return;
+            currentBrand = brandName;
+            
+            productGrid.style.opacity = '0.5';
+            
+            const currentSort = new URLSearchParams(window.location.search).get('sort') || 'newest';
+            const params = new URLSearchParams();
+            if (urlSearch) params.set('search', urlSearch);
+            if (currentSort !== 'newest') params.set('sort', currentSort);
+            
+            const url = window.location.pathname + '?' + params.toString();
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(response => response.text())
+            .then(html => {
+                productGrid.innerHTML = html;
+                productGrid.style.opacity = '1';
+                window.history.pushState({}, '', url);
+                
+                const searchInput = document.querySelector('input[name="search"]');
+                if (searchInput) searchInput.value = urlSearch;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                productGrid.style.opacity = '1';
+            });
+        };
+
+        const updateFocus = () => {
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const center = wrapperRect.left + (wrapperRect.width / 2);
+            let closestItem = null;
+            let minDistance = Infinity;
+            
+            items.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
+                const distance = Math.abs(center - (itemRect.left + itemRect.width / 2));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestItem = item;
+                }
+            });
+            
+            items.forEach(item => {
+                if (item === closestItem) {
+                    item.classList.add('active-focus');
+                    
+                    const newBgUrl = item.getAttribute('data-bg-url');
+                    const newTitle = item.getAttribute('data-hero-title');
+                    const newBadge = item.getAttribute('data-hero-badge');
+                    const newSubtitle = item.getAttribute('data-hero-subtitle');
+                    
+                    const hero = document.querySelector('.special-hero');
+                    const titleElem = document.querySelector('.special-title');
+                    const badgeElem = document.querySelector('.badge');
+                    const subtitleElem = document.querySelector('.special-subtitle');
+
+                    if (hero && newBgUrl) {
+                        hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("${newBgUrl}")`;
+                    }
+                    if (titleElem && newTitle) titleElem.textContent = newTitle;
+                    if (badgeElem && newBadge) badgeElem.textContent = newBadge;
+                    if (subtitleElem && newSubtitle) subtitleElem.textContent = newSubtitle;
+                    
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        fetchProducts(item.getAttribute('data-brand'));
+                    }, 400);
+                } else {
+                    item.classList.remove('active-focus');
+                }
+            });
+        };
+        
+        wrapper.addEventListener('scroll', updateFocus);
+        window.addEventListener('resize', updateFocus);
+        
+        setTimeout(() => {
+            let activeBtn = Array.from(items).find(i => i.getAttribute('data-brand') === currentBrand);
+            if (!activeBtn) activeBtn = document.querySelector('.brand-item[data-brand="ALL"]');
+            if (activeBtn) activeBtn.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+            updateFocus();
+        }, 100);
+        
+        wrapper.addEventListener('wheel', (evt) => {
+            if (evt.deltaY !== 0) {
+                evt.preventDefault();
+                wrapper.scrollLeft += evt.deltaY;
+            }
+        });
+    }
+
+    // Wishlist Toggle (Event Delegation)
+    document.addEventListener('click', function(e) {
+        const toggle = e.target.closest('.wishlist-toggle');
+        if (toggle) {
+            e.preventDefault();
+            const productId = toggle.getAttribute('data-id');
+            const element = toggle;
+            
+            fetch(`/add_to_wishlist/${productId}`, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = "{% url 'login_user' %}";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.status === 'success') {
+                    if (data.added) {
+                        element.innerHTML = '❤️';
+                        element.style.opacity = '1';
+                    } else {
+                        element.innerHTML = '🤍';
+                        element.style.opacity = '0.8';
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
+    // Pagination/Search AJAX (Optional but nice for fluidity)
+    const handleAjaxNav = (e) => {
+        const link = e.target.closest('.pagination-container a, .search-form');
+        if (link && !link.classList.contains('search-form')) {
+            e.preventDefault();
+            const url = link.getAttribute('href');
+            
+            productGrid.style.opacity = '0.5';
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.text())
+            .then(html => {
+                productGrid.innerHTML = html;
+                productGrid.style.opacity = '1';
+                window.history.pushState({}, '', url);
+            });
+        }
+    };
+    
+    document.addEventListener('click', handleAjaxNav);
+
+    // Sorting functionality
+    window.applySort = function(sortValue) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', sortValue);
+        urlParams.set('page', '1'); // Reset to page 1 on sort
+        
+        const newUrl = window.location.pathname + '?' + urlParams.toString();
+        
+        productGrid.style.opacity = '0.5';
+        fetch(newUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.text())
+        .then(html => {
+            productGrid.innerHTML = html;
+            productGrid.style.opacity = '1';
+            window.history.pushState({}, '', newUrl);
+            
+            // Update hidden sort input in filter form
+            document.querySelector('input[name="sort"]').value = sortValue;
+            
+            // Re-update the count display if total count changed (it shouldn't, but range might)
+            // For simplicity, we'll just reload the meta bar if needed, or 
+            // naturally the user can refresh. But since it's AJAX, we should update the meta bar text.
+            // I'll add a snippet to update the count text.
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            // Actually, product_grid.html doesn't contain the meta bar.
+            // I'll add the meta bar into the AJAX response or just reload the page for sort.
+            // For premium feel, let's just reload the page for now or update manually.
+            window.location.href = newUrl; 
+        });
+    };
+});
+</script>
+{% endblock %}

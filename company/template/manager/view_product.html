@@ -1,149 +1,431 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Products</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.75);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --primary-accent: #2563eb;
+        --secondary-accent: #475569;
+        --success-glow: #10b981;
+        --danger-glow: #ef4444;
+    }
+
+    .dashboard-bg {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        padding: 60px 0;
+        min-height: 80vh;
+    }
+
+    .stats-row {
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    }
+
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    .stat-info h3 {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        margin: 0 0 5px 0;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-info .value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .inventory-dashboard {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 35px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .inventory-search {
+        position: relative;
+        max-width: 350px;
+        width: 100%;
+    }
+
+    .inventory-search input {
+        width: 100%;
+        padding: 12px 20px 12px 45px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .inventory-search .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .inventory-table-container {
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+
+    .modern-table th {
+        padding: 15px 20px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+    }
+
+    .modern-table tbody tr {
+        background: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .modern-table tbody tr:hover {
+        transform: scale(1.01);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+        z-index: 10;
+        position: relative;
+    }
+
+    .modern-table td {
+        padding: 18px 20px;
+        vertical-align: middle;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        color: #475569;
+        font-weight: 500;
+    }
+
+    .modern-table td:first-child {
+        border-left: 1px solid #f1f5f9;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .modern-table td:last-child {
+        border-right: 1px solid #f1f5f9;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .product-thumb {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+    }
+
+    .price-tag {
+        font-weight: 700;
+        color: #059669;
+        font-size: 16px;
+    }
+
+    .badge-stock {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-in-stock {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .badge-low-stock {
+        background: #fff7ed;
+        color: #c2410c;
+        animation: pulse-warning 1.5s ease-in-out infinite;
+    }
+
+    .badge-out-of-stock {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    @keyframes pulse-warning {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(194, 65, 12, 0.3); }
+        50% { box-shadow: 0 0 0 5px rgba(194, 65, 12, 0); }
+    }
+
+    .action-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        transition: all 0.2s;
+        border: none;
+        background: #f1f5f9;
+    }
+
+    .btn-edit {
+        color: #2563eb;
+    }
+
+    .btn-edit:hover {
+        background: #2563eb;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-delete {
+        color: #ef4444;
+    }
+
+    .btn-delete:hover {
+        background: #ef4444;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-back-dashboard {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        background: #1e293b;
+        color: white;
+        text-decoration: none !important;
+        border-radius: 14px;
+        font-weight: 700;
+        margin-top: 40px;
+        transition: all 0.3s;
+    }
+
+    .btn-back-dashboard:hover {
+        background: #0f172a;
+        transform: translateX(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: stretch;
         }
-
-        .table-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1000px;
-            text-align: center;
+        .inventory-search {
+            max-width: none;
         }
+    }
+</style>
 
-        .table-container h2 {
-            margin-bottom: 20px;
-            color: #333;
-            text-transform: uppercase;
-        }
+<div class="dashboard-bg">
+    <div class="container-lg">
+        <!-- Dashboard Stats -->
+        <div class="row stats-row">
+            <div class="col-md-4 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: #6366f1;">📦</div>
+                    <div class="stat-info">
+                        <h3>Total Products</h3>
+                        <p class="value">{{ total_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: #f59e0b;">⚠️</div>
+                    <div class="stat-info">
+                        <h3>Low Stock Alert</h3>
+                        <p class="value" style="{% if low_stock_count > 0 %}color: #ef4444;{% endif %}">
+                            {{ low_stock_count }} items
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: #10b981;">💰</div>
+                    <div class="stat-info">
+                        <h3>Catalog Value</h3>
+                        <p class="value">₹{{ total_value }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-        }
+        <!-- Main Inventory Panel -->
+        <div class="inventory-dashboard">
+            <div class="dashboard-header">
+                <h2>{% if is_special %}Premium Product Inventory{% else %}Product Inventory{% endif %}</h2>
+                <div class="inventory-search">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="inventorySearch" placeholder="Search by name or category..." onkeyup="filterInventory()">
+                </div>
+            </div>
 
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            vertical-align: middle;
-        }
+            <div class="inventory-table-container">
+                <table class="modern-table" id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Preview</th>
+                            <th>Product Details</th>
+                            <th>Pricing</th>
+                            <th>Inventory Status</th>
+                            <th>Category</th>
+                            <th style="text-align: center;">Controls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in data %}
+                        <tr>
+                            <td>
+                                {% if i.image %}
+                                    <img src="{{ i.image.url }}" class="product-thumb" alt="{{ i.name }}">
+                                {% else %}
+                                    <div class="product-thumb d-flex align-items-center justify-content-center text-muted fs-6">?</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="fw-bold fs-5 text-dark">{{ i.name }}</div>
+                                <div class="text-muted small">ID: #{{ i.id|stringformat:"05d" }}</div>
+                            </td>
+                            <td>
+                                <div class="price-tag">₹{{ i.price }}</div>
+                            </td>
+                            <td>
+                                {% if i.stock == 0 %}
+                                <span class="badge-stock badge-out-of-stock">
+                                    🔴 OUT OF STOCK
+                                </span>
+                                {% elif i.stock < 3 %}
+                                <span class="badge-stock badge-low-stock">
+                                    🟠 {{ i.stock }} UNITS — LOW STOCK
+                                </span>
+                                {% else %}
+                                <span class="badge-stock badge-in-stock">
+                                    🟢 {{ i.stock }} UNITS
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-muted fw-bold">{{ i.category.name }}</span>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a href="{% url 'edit_product' i.id %}" class="icon-btn btn-edit" title="Edit Product">
+                                        ✏️
+                                    </a>
+                                    <a href="{% url 'delete_product' i.id %}" class="icon-btn btn-delete" 
+                                       onclick="return confirm('Permanently delete {{ i.name }} from the catalog?')" title="Delete Product">
+                                        🗑️
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .product-img {
-            border-radius: 5px;
-            object-fit: cover;
-        }
-
-        .action-link {
-            display: inline-block;
-            padding: 6px 12px;
-            margin: 0 4px;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .btn-edit {
-            background-color: #007bff;
-        }
-
-        .btn-edit:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-delete {
-            background-color: #dc3545;
-        }
-
-        .btn-delete:hover {
-            background-color: #c82333;
-        }
-
-        .btn-back {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #333;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 15px;
-            transition: background 0.3s;
-        }
-
-        .btn-back:hover {
-            background: #555;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="table-container">
-        <h2>View Products</h2>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Photo</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Category</th>
-                    <th style="text-align: center;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in data %}
-                <tr>
-                    <td>
-                        {% if i.image %}
-                            <img src="{{ i.image.url }}" width="60" height="60" class="product-img">
-                        {% else %}
-                            <span style="color: #999; font-size: 12px;">No Image</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ i.name }}</td>
-                    <td>{{ i.price }}</td>
-                    <td>{{ i.stock }}</td>
-                    <td>{{ i.category }}</td>
-                    <td style="text-align: center;">
-                        <a href="{% url 'edit_product' i.id %}" class="action-link btn-edit">Edit</a>
-                        <a href="{% url 'delete_product' i.id %}" class="action-link btn-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        <a href="{% url 'adminhome' %}" class="btn-back">&larr; Back to Admin Home</a>
+            <div class="text-center">
+                <a href="{% url 'adminhome' %}" class="btn-back-dashboard">
+                    <span>←</span> Return to Admin Center
+                </a>
+            </div>
+        </div>
     </div>
+</div>
 
-</body>
-</html>
+<script>
+function filterInventory() {
+    let input = document.getElementById("inventorySearch");
+    let filter = input.value.toLowerCase();
+    let table = document.getElementById("inventoryTable");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+        let nameCol = tr[i].getElementsByTagName("td")[1];
+        let categoryCol = tr[i].getElementsByTagName("td")[4];
+        if (nameCol || categoryCol) {
+            let nameText = nameCol.textContent || nameCol.innerText;
+            let categoryText = categoryCol.textContent || categoryCol.innerText;
+            if (nameText.toLowerCase().indexOf(filter) > -1 || categoryText.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

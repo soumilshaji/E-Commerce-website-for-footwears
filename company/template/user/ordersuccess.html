@@ -1,285 +1,191 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Successful - UrbanSole</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #000000;
-            --primary-hover: #333333;
-            --background: #f4f5f7;
-            --surface: #ffffff;
-            --text-dark: #1a1a1a;
-            --text-muted: #6c757d;
-            --border-color: #eaeaea;
-            --success: #198754;
-            --success-light: #d1e7dd;
-        }
+{% extends 'common/base.html' %}
+{% load static %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background);
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+{% block content %}
+<style>
+    :root {
+        --primary-color: #000000;
+        --success-color: #28a745;
+        --background: #f4f5f7;
+        --surface: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-muted: #6c757d;
+        --border-color: #eaeaea;
+    }
 
-        /* Navbar */
-        .navbar {
-            background-color: var(--surface);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    .success-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 20px;
+        background-color: var(--background);
+    }
 
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--primary-color);
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .success-card {
+        background: var(--surface);
+        width: 100%;
+        max-width: 600px;
+        border-radius: 24px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
 
-        .nav-item {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            font-size: 15px;
-        }
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        background: #e8f5e9;
+        color: var(--success-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        margin: 0 auto 30px;
+        animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
 
-        .nav-item:hover {
-            background-color: #f1f3f5;
-        }
+    @keyframes scaleIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+    }
 
-        /* Success Container */
-        .success-wrapper {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-        }
+    .success-title {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: var(--text-dark);
+        letter-spacing: -1px;
+    }
 
-        .success-card {
-            background: var(--surface);
-            width: 100%;
-            max-width: 550px;
-            border-radius: 20px;
-            padding: 50px 40px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
+    .success-message {
+        font-size: 18px;
+        color: var(--text-muted);
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
 
-        .success-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: var(--success);
-        }
+    .order-info-box {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 40px;
+        text-align: left;
+    }
 
-        .icon-circle {
-            width: 90px;
-            height: 90px;
-            background-color: var(--success-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px auto;
-            color: var(--success);
-        }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
 
-        .icon-circle svg {
-            width: 45px;
-            height: 45px;
-        }
+    .info-row:last-child {
+        margin-bottom: 0;
+        padding-top: 15px;
+        border-top: 1px dashed #ced4da;
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--text-dark);
+    }
 
-        h1 {
-            font-size: 32px;
-            font-weight: 800;
-            margin: 0 0 10px 0;
-            color: var(--text-dark);
-            letter-spacing: -0.5px;
-        }
+    .info-label {
+        color: var(--text-muted);
+    }
 
-        .subtitle {
-            font-size: 18px;
-            color: var(--text-muted);
-            margin: 0 0 35px 0;
-            line-height: 1.5;
-        }
+    .info-value {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
 
-        .order-details {
-            background: var(--background);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 35px;
-            text-align: left;
-        }
+    .success-btn-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
 
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 15px;
-        }
+    .btn-success {
+        padding: 18px 30px;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 14px;
+        text-align: center;
+    }
 
-        .detail-row:last-child {
-            margin-bottom: 0;
-            padding-top: 15px;
-            border-top: 1px dashed #ccc;
-            font-weight: 700;
-            font-size: 20px;
-            color: var(--text-dark);
-        }
+    .btn-success-primary {
+        background: var(--primary-color);
+        color: white;
+    }
 
-        .detail-label {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
+    .btn-success-primary:hover {
+        background: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
 
-        .detail-value {
-            color: var(--text-dark);
-            font-weight: 600;
-        }
+    .btn-success-secondary {
+        background: transparent;
+        color: var(--text-dark);
+        border: 2px solid var(--border-color);
+    }
 
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            flex-direction: column;
-        }
+    .btn-success-secondary:hover {
+        background: #fff;
+        border-color: var(--text-dark);
+        transform: translateY(-2px);
+    }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            width: 100%;
-            box-sizing: border-box;
+    @media (max-width: 600px) {
+        .success-btn-group {
+            grid-template-columns: 1fr;
         }
+    }
+</style>
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--background);
-            border-color: var(--text-muted);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                padding: 15px;
-            }
-            .nav-links {
-                margin-top: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .success-card {
-                padding: 40px 25px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <a href="{% url 'userhome' %}" class="navbar-brand">UrbanSole</a>
-        <div class="nav-links">
-            <a href="{% url 'cartitems' %}" class="nav-item">🛒 Cart</a>
-            <a href="{% url 'vieworder' %}" class="nav-item">📦 Orders</a>
-            <a href="{% url 'wishlistview' %}" class="nav-item">❤️ Wishlist</a>
-            <a href="{% url 'userdetails' %}" class="nav-item">👤 Profile</a>
-            <a href="{% url 'logout' %}" class="nav-item logout" style="background-color: #dc3545; color: white;">Logout</a>
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">✓</div>
+        
+        <h1 class="success-title">Order Confirmed!</h1>
+        <p class="success-message">
+            Thank you for your order. We've received your request and our team is already working on getting your items to you as fast as possible.
+        </p>
+        
+        <div class="order-info-box">
+            <div class="info-row">
+                <span class="info-label">Order Number</span>
+                <span class="info-value">#{{ order.id|stringformat:"06d" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Payment Method</span>
+                <span class="info-value">{{ order.payment_method }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Total Amount</span>
+                <span class="info-value">₹{{ order.total_amount }}</span>
+            </div>
         </div>
-    </nav>
-
-    <div class="success-wrapper">
-        <div class="success-card">
-            <div class="icon-circle">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-            
-            <h1>Order Confirmed!</h1>
-            <p class="subtitle">Thank you for your purchase. We've received your order and are getting it ready.</p>
-
-            <div class="order-details">
-                <div class="detail-row">
-                    <span class="detail-label">Order Number</span>
-                    <span class="detail-value">#{{ order.id|stringformat:"06d" }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Payment Method</span>
-                    <span class="detail-value">{{ order.payment_method|default:"Standard" }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Total Amount Paid</span>
-                    <span class="detail-value">₹{{ order.total_amount }}</span>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <a href="{% url 'userhome' %}" class="btn btn-primary">Continue Shopping</a>
-                <a href="{% url 'vieworder' %}" class="btn btn-secondary">View Order History</a>
-            </div>
+        
+        <div class="success-btn-group">
+            <a href="{% url 'vieworder' %}" class="btn-success btn-success-primary">
+                My Orders
+            </a>
+            <a href="{% url 'userhome' %}" class="btn-success btn-success-secondary">
+                Continue Shopping
+            </a>
         </div>
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}

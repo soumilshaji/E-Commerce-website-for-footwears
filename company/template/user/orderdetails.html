@@ -2,69 +2,236 @@
 {% load static %}
 
 {% block content %}
-<section class="py-5 bg-light my-5">
-  <div class="container-lg">
-    <div class="row justify-content-center">
+<section class="py-5 bg-light my-5" style="min-height: 80vh;">
+  <div class="container-lg position-relative">
+    
+    <!-- STAMPS Overlay -->
+    {% if order.orderstatus|lower == 'canceled' %}
+    <div class="canceled-stamp" style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -30%) rotate(-15deg); z-index: 100; pointer-events: none; opacity: 0.9; user-select: none;">
+      <div style="border: 8px solid #dc3545; color: #dc3545; font-size: clamp(3rem, 5vw, 6rem); font-weight: 900; text-transform: uppercase; padding: 20px 40px; border-radius: 20px; font-family: 'Courier New', Courier, monospace; letter-spacing: 5px; box-shadow: inset 0 0 0 5px #dc3545, 0 0 0 5px #dc3545 inset; text-shadow: 2px 2px 0px rgba(220,53,69,0.2); background: rgba(255,255,255,0.3); backdrop-filter: blur(2px);">
+        CANCELLED
+      </div>
+    </div>
+    {% elif order.orderstatus|lower == 'completed' %}
+    <div class="approved-stamp" style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -30%) rotate(-15deg); z-index: 100; pointer-events: none; opacity: 0.9; user-select: none;">
+      <div style="border: 8px solid #198754; color: #198754; font-size: clamp(3rem, 5vw, 6rem); font-weight: 900; text-transform: uppercase; padding: 20px 60px; border-radius: 100px; font-family: 'Courier New', Courier, monospace; letter-spacing: 5px; box-shadow: inset 0 0 0 5px #198754, 0 0 0 5px #198754 inset; text-align: center; line-height: 1.1; text-shadow: 2px 2px 0px rgba(25,135,84,0.2); background: rgba(255,255,255,0.3); backdrop-filter: blur(2px);">
+        <div style="font-size: clamp(1rem, 2vw, 1.8rem); letter-spacing: 15px; margin-bottom: -5px;">&#9733;&#9733;&#9733;</div>
+        APPROVED
+        <div style="font-size: clamp(1rem, 2vw, 1.8rem); letter-spacing: 15px; margin-top: -5px;">&#9733;&#9733;&#9733;</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+      <div>
+        <h2 class="display-6 fw-bold mb-1">Order #{{ order.id|stringformat:"06d" }}</h2>
+        <p class="text-muted mb-0 fs-5"><i class="far fa-calendar-alt me-2"></i> Placed on {{ order.orderdate|date:"F d, Y" }}</p>
+      </div>
+      <div>
+        <a href="{% url 'vieworder' %}" class="btn btn-outline-theme rounded-pill px-4 py-2 fw-bold shadow-sm text-uppercase"><i class="fas fa-arrow-left me-2"></i> Back to Orders</a>
+      </div>
+    </div>
+
+    <div class="row g-4 position-relative" style="{% if order.orderstatus|lower == 'canceled' or order.orderstatus|lower == 'completed' %}opacity: 0.55; filter: grayscale(20%);{% endif %} transition: all 0.3s ease;">
+      
+      <!-- Left Column: Items & Progress -->
       <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-4">
-          <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
-            <h4 class="fw-bold mb-0">Order Details <span class="text-muted fw-normal fs-5">#{{ order.id }}</span></h4>
-            <span class="badge bg-dark text-white rounded-pill px-3 py-2 text-uppercase">{{ order.orderstatus|default:"Processed" }}</span>
-          </div>
+        
+        <!-- Progress Tracker Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
           <div class="card-body p-5">
-            <div class="row g-4 mb-4">
-              <div class="col-md-6">
-                <div class="p-3 bg-light rounded h-100">
-                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Order Date</span>
-                  <span class="fs-6 fw-semibold text-dark">{{ order.orderdate }}</span>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="p-3 bg-light rounded h-100">
-                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Est. Delivery Date</span>
-                  <span class="fs-6 fw-semibold text-dark">{{ order.deliverydate|default:"TBD" }}</span>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <div class="p-3 bg-light rounded h-100">
-                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Payment Status</span>
-                  <span class="fs-6 fw-semibold text-dark">{{ order.paymentstatus|default:"Pending" }}</span>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="p-3 bg-light rounded h-100">
-                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Payment Method</span>
-                  <span class="fs-6 fw-semibold text-dark">{{ order.payment_method|default:"N/A" }}</span>
-                </div>
+            <h5 class="fw-bold mb-5 text-uppercase" style="letter-spacing: 1px;">Order Status Tracker</h5>
+            
+            <div class="position-relative mx-3 mx-md-5 my-4">
+              <!-- Progress Bar Track -->
+              <div class="progress" style="height: 6px; background-color: #e9ecef; border-radius: 10px;">
+                {% if order.orderstatus|lower == 'pending' %}
+                <div class="progress-bar bg-dark progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%"></div>
+                {% elif order.orderstatus|lower == 'processing' %}
+                <div class="progress-bar bg-info progress-bar-striped progress-bar-animated" role="progressbar" style="width: 50%"></div>
+                {% elif order.orderstatus|lower == 'shipped' %}
+                <div class="progress-bar bg-theme progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%"></div>
+                {% elif order.orderstatus|lower == 'completed' %}
+                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                {% endif %}
               </div>
               
-              <div class="col-md-6">
-                <div class="p-3 bg-light rounded h-100">
-                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Tracking ID</span>
-                  <span class="fs-6 fw-semibold text-dark">{{ order.tracking_id|default:"Not Yet Dispatched" }}</span>
-                </div>
+              <!-- Step 1: Placed -->
+              <div class="position-absolute top-50 start-0 translate-middle text-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white mx-auto shadow-sm {% if order.orderstatus|lower != 'canceled' %}bg-dark{% else %}bg-secondary{% endif %}" style="width: 45px; height: 45px; border: 5px solid white;">1</div>
+                <small class="d-block mt-2 fw-bold {% if order.orderstatus|lower != 'canceled' %}text-dark{% else %}text-muted{% endif %}">Placed</small>
               </div>
-              <div class="col-md-6">
-                <div class="p-3 bg-light rounded h-100">
-                  <span class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.85em;">Carrier</span>
-                  <span class="fs-6 fw-semibold text-dark">{{ order.carrier|default:"N/A" }}</span>
-                </div>
+
+              <!-- Step 2: Processing -->
+              <div class="position-absolute top-50 start-50 translate-middle text-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white mx-auto shadow-sm {% if order.orderstatus|lower == 'processing' or order.orderstatus|lower == 'shipped' or order.orderstatus|lower == 'completed' %}bg-info{% else %}bg-secondary{% endif %}" style="width: 45px; height: 45px; border: 5px solid white;">2</div>
+                <small class="d-block mt-2 fw-bold {% if order.orderstatus|lower == 'processing' or order.orderstatus|lower == 'shipped' or order.orderstatus|lower == 'completed' %}text-info{% else %}text-muted{% endif %}">Processing</small>
+              </div>
+
+              <!-- Step 3: Completed -->
+              <div class="position-absolute top-50 start-100 translate-middle text-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white mx-auto shadow-sm {% if order.orderstatus|lower == 'completed' %}bg-success{% else %}bg-secondary{% endif %}" style="width: 45px; height: 45px; border: 5px solid white;"><i class="fas fa-check"></i></div>
+                <small class="d-block mt-2 fw-bold {% if order.orderstatus|lower == 'completed' %}text-success{% else %}text-muted{% endif %}">Delivered</small>
               </div>
             </div>
 
-            <div class="border-top pt-4 mt-2 d-flex justify-content-between align-items-center">
-              <span class="text-uppercase fw-bold text-muted">Total Amount</span>
-              <span class="display-6 fw-bold text-black">${{ order.total_amount }}</span>
+            {% if order.orderstatus|lower == 'canceled' %}
+              <div class="mt-5 text-center">
+                <span class="badge bg-danger p-3 fs-6 rounded-pill shadow-sm"><i class="fas fa-times-circle me-2"></i> This order was canceled</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Items Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+          <div class="card-header bg-white border-bottom p-4">
+            <h5 class="fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">Items in this Order</h5>
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              {% for i in items %}
+              <li class="list-group-item p-4 d-flex flex-column flex-sm-row align-items-sm-center border-bottom-0 border-light mb-1">
+                <div class="bg-light rounded p-3 me-sm-4 mb-3 mb-sm-0 mx-auto mx-sm-0 border" style="width: 100px; height: 100px;">
+                  <img src="{{ i.product.image.url }}" class="w-100 h-100 object-fit-contain mix-blend-multiply" alt="{{ i.product.name }}">
+                </div>
+                <div class="flex-grow-1 text-center text-sm-start">
+                  <h5 class="fw-bold mb-1">{{ i.product.name }}</h5>
+                  <p class="text-muted mb-0"><span class="badge bg-secondary">Qty: {{ i.quantity }}</span>{% if i.size %} <span class="badge bg-dark ms-1">{{ i.size }}</span>{% endif %}</p>
+                </div>
+                <div class="text-center text-sm-end mt-3 mt-sm-0">
+                  <span class="text-muted d-block" style="font-size: 0.85em;">Price per item: ₹{{ i.product.price }}</span>
+                  <span class="fs-4 fw-bold text-dark">₹{{ i.total|default:i.product.price }}</span>
+                </div>
+              </li>
+              {% empty %}
+              <li class="list-group-item p-5 text-center text-muted">No items found for this order.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Summary & Info -->
+      <div class="col-lg-4">
+        
+        <!-- Summary Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-theme text-white p-4 border-0">
+            <h5 class="fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">Order Summary</h5>
+          </div>
+          <div class="card-body p-4 bg-white rounded-bottom-4">
+            
+            <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+              <span class="text-muted fw-semibold">Payment Status</span>
+              <span class="fw-bold text-uppercase 
+                {% if order.paymentstatus|lower == 'failed' %}text-danger{% elif order.paymentstatus|lower == 'paid' or order.paymentstatus|lower == 'completed' %}text-success{% else %}text-warning{% endif %}">
+                <i class="fas {% if order.paymentstatus|lower == 'failed' %}fa-times-circle{% elif order.paymentstatus|lower == 'paid' or order.paymentstatus|lower == 'completed' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                {{ order.paymentstatus|default:"Pending" }}
+              </span>
             </div>
             
-            <div class="mt-5 text-center">
-              <a href="{% url 'vieworder' %}" class="btn btn-outline-gray text-uppercase px-5 py-3 rounded-pill border border-2">Back to Orders</a>
+            <div class="d-flex justify-content-between mb-4 border-bottom pb-3">
+              <span class="text-muted fw-semibold">Payment Method</span>
+              <span class="fw-bold text-dark">{{ order.payment_method|default:"N/A" }}</span>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-2 bg-light p-3 rounded-3 border">
+              <span class="fs-5 fw-bold text-muted">Total Amount</span>
+              <span class="fs-3 fw-bold text-dark">₹{{ order.total_amount }}</span>
             </div>
           </div>
         </div>
+
+        <!-- Shipping & Tracking Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-4 text-uppercase border-bottom pb-3" style="letter-spacing: 1px;">Shipping Details</h5>
+            
+            <div class="mb-4">
+              <div class="d-flex align-items-center text-muted text-uppercase fw-bold mb-2" style="font-size: 0.8em;">
+                <i class="fas fa-truck me-2"></i> Tracking Carrier
+              </div>
+              <p class="fs-5 fw-semibold mb-0 text-dark">{{ order.carrier|default:"Pending Assignment" }}</p>
+            </div>
+            
+            <div class="mb-4">
+              <div class="d-flex align-items-center text-muted text-uppercase fw-bold mb-2" style="font-size: 0.8em;">
+                <i class="fas fa-barcode me-2"></i> Tracking ID
+              </div>
+              <p class="fs-5 fw-semibold mb-0 text-dark">{{ order.trackingid|default:"Not Yet Dispatched" }}</p>
+            </div>
+            
+            <div class="bg-light p-3 rounded-3 border">
+              <div class="d-flex align-items-center text-muted text-uppercase fw-bold mb-2" style="font-size: 0.8em;">
+                <i class="far fa-calendar-check me-2"></i> Est. Delivery
+              </div>
+              <p class="fs-5 fw-bold text-theme mb-0">{{ order.deliverydate|default:"TBD" }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        {% if order.orderstatus|lower != 'completed' and order.orderstatus|lower != 'canceled' %}
+        <div class="d-grid shadow-sm rounded-pill mt-4">
+          <button type="button" class="btn btn-outline-danger btn-lg rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+            <i class="fas fa-ban me-2"></i> Cancel Order
+          </button>
+        </div>
+        {% endif %}
+
       </div>
     </div>
+
   </div>
 </section>
+
+{% if order.orderstatus|lower != 'completed' and order.orderstatus|lower != 'canceled' %}
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header bg-danger text-white border-bottom-0 p-4">
+        <h5 class="modal-title fw-bold" id="cancelOrderModalLabel">Cancel Order #{{ order.id|stringformat:"06d" }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="modal-body p-4 bg-white">
+          <div class="text-center mb-4 mt-2">
+            <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-3" style="width: 70px; height: 70px;">
+              <i class="fas fa-exclamation-triangle fa-2x"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Are you absolutely sure?</h5>
+            <p class="text-muted">This action is permanent and cannot be undone.</p>
+          </div>
+          
+          <div class="mb-3 px-2">
+            <label for="cancel_reason" class="form-label text-uppercase fw-bold text-muted mb-2" style="font-size: 0.85em;">Reason for Cancellation (Optional)</label>
+            <textarea class="form-control bg-light border p-3 shadow-none rounded-3" id="cancel_reason" name="cancel_reason" rows="3" placeholder="Tell us why you're cancelling..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-top-0 p-3 d-flex gap-3 justify-content-center">
+          <button type="button" class="btn btn-secondary rounded-pill px-5 fw-bold" data-bs-dismiss="modal">Keep Order</button>
+          <button type="submit" name="cancel_order" class="btn btn-danger rounded-pill px-5 fw-bold shadow-sm">Yes, Cancel Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+<style>
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+  .bg-theme { background-color: var(--primary-orange) !important; color: white !important;}
+  .text-theme { color: var(--primary-orange) !important; }
+  .btn-theme { background-color: var(--primary-orange); border-color: var(--primary-orange); color: white; transition: all 0.3s; }
+  .btn-theme:hover { background-color: var(--hero-orange); border-color: var(--hero-orange); color: white; }
+  .btn-outline-theme { border-color: var(--primary-orange); color: var(--primary-orange); transition: all 0.3s; }
+  .btn-outline-theme:hover { background-color: var(--primary-orange); color: white; }
+  .badge-theme { background-color: rgba(255, 102, 0, 0.1) !important; color: var(--primary-orange) !important; border: 1px solid var(--primary-orange) !important; }
+</style>
 {% endblock %}

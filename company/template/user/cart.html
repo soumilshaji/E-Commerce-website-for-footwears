@@ -21,6 +21,7 @@
                   <thead class="text-muted border-bottom">
                     <tr>
                       <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Product</th>
+                      <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Size</th>
                       <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Price</th>
                       <th scope="col" class="text-uppercase fw-bold text-secondary" style="font-size: 0.8em;">Quantity</th>
                       <th scope="col" class="text-uppercase fw-bold text-secondary text-end" style="font-size: 0.8em;">Total</th>
@@ -37,7 +38,14 @@
                           </div>
                         </div>
                       </td>
-                      <td class="fw-semibold text-muted">${{ i.product.price }}</td>
+                      <td>
+                        {% if i.size %}
+                        <span class="badge bg-dark rounded-pill px-3 py-2">{{ i.size }}</span>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                      </td>
+                      <td class="fw-semibold text-muted">₹{{ i.product.price }}</td>
                       <td>
                         <div class="input-group input-group-sm" style="width: 120px;">
                           <a href="{% url 'decrease_quantity' i.id %}" class="btn btn-outline-secondary px-3">-</a>
@@ -45,7 +53,7 @@
                           <a href="{% url 'increase_quantity' i.id %}" class="btn btn-outline-secondary px-3">+</a>
                         </div>
                       </td>
-                      <td class="text-end fw-bold text-black">${{ i.total }}</td>
+                      <td class="text-end fw-bold text-black">₹{{ i.total }}</td>
                     </tr>
                     {% endfor %}
                   </tbody>

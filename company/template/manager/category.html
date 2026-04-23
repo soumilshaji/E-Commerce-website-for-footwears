@@ -1,25 +1,141 @@
-<!-- done -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-         <form action="{% url 'category' %}" method="post">
-        {% csrf_token  %}
-        <label for="">Name</label>
-        <input type="text" name="name"><br>
-        <label for="">Description</label><br>
-        <textarea name="description" rows="4" cols="40"></textarea><br>
-        <input type="submit">
+{% extends 'common/base.html' %}
+{% load static %}
 
-     {% if messages %}
-    {% for msg in messages  %}
-    <script>alert('{{msg}}')</script>
-    {% endfor %}
-    {% endif %}
-    </form>
-</body>
-</html>
+{% block content %}
+<style>
+    .admin-wrapper {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("{% static 'stylish-1.0.0/images/card-image1.jpg' %}") no-repeat center center;
+        background-size: cover;
+        background-attachment: fixed;
+        padding: 80px 20px;
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .admin-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 50px;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .admin-card h2 {
+        margin-bottom: 30px;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    .form-field {
+        margin-bottom: 25px;
+        text-align: left;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .admin-card input[type="text"],
+    .admin-card textarea {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-family: inherit;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .admin-card input[type="text"]::placeholder,
+    .admin-card textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .admin-card input:focus, .admin-card textarea:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-admin-submit {
+        width: 100%;
+        padding: 16px;
+        background: {% if is_special %}rgba(247, 127, 0, 0.8){% else %}rgba(37, 99, 235, 0.8){% endif %};
+        color: white;
+        border: 1px solid {% if is_special %}rgba(247, 127, 0, 0.4){% else %}rgba(37, 99, 235, 0.4){% endif %};
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-admin-submit:hover {
+        background: {% if is_special %}rgba(247, 127, 0, 1){% else %}rgba(37, 99, 235, 1){% endif %};
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px {% if is_special %}rgba(247, 127, 0, 0.3){% else %}rgba(37, 99, 235, 0.3){% endif %};
+    }
+
+    .back-nav {
+        display: block;
+        margin-top: 30px;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        transition: color 0.3s;
+    }
+
+    .back-nav:hover {
+        color: white;
+    }
+</style>
+
+<div class="admin-wrapper">
+    <div class="admin-card">
+        <h2>{% if is_special %}Create Premium Category{% else %}Create New Category{% endif %}</h2>
+        <form action="{% url 'category' %}{% if is_special %}?special=true{% endif %}" method="post">
+            {% csrf_token %}
+            
+            <div class="form-field">
+                <label>Category Name</label>
+                <input type="text" name="name" placeholder="e.g. Basketball, Casual..." required>
+            </div>
+            
+            <div class="form-field">
+                <label>Category Description</label>
+                <textarea name="description" rows="4" placeholder="Briefly describe the collection types..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn-admin-submit">Create Category</button>
+        </form>
+        <a href="{% url 'adminhome' %}" class="back-nav">&larr; Back to Management Console</a>
+    </div>
+</div>
+{% endblock %}

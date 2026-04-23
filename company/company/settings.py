@@ -126,7 +126,7 @@ STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
+# STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
 
 load_dotenv()
 
@@ -134,7 +134,7 @@ SECRET_KEY=os.getenv('SECRET_KEY')
 EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
 STRIPE_SECRET_KEY=os.getenv('STRIPE_SECRET_KEY')
 EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
-DEBUG = os.getenv('DEBUG',False).lower == 'true'
+DEBUG = os.getenv('DEBUG') == 'True'
 
 # git add .
 

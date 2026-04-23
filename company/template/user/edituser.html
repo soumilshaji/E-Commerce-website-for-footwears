@@ -1,46 +1,146 @@
-<!-- done -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-        <form action="{% url 'edituser'  %}" enctype="multipart/form-data" method="post">
-        {% csrf_token  %}
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .profile-edit-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    .profile-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        border: 1px solid #eaeaea;
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    .form-control:focus {
+        border-color: #000;
+        outline: none;
+    }
+    .profile-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #f0f0f0;
+    }
+    .btn-save {
+        background: #000;
+        color: #fff;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    .btn-save:hover {
+        background: #333;
+        transform: translateY(-2px);
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #666;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .back-link:hover {
+        color: #000;
+    }
+</style>
+
+<div class="profile-edit-container">
+    <a href="{% url 'userdetails' %}" class="back-link">← Save & Back to Profile</a>
+    
+    <div class="profile-card">
+        <h2 style="margin-top: 0; margin-bottom: 30px; font-weight: 800;">Edit Profile</h2>
         
-        <label>Profile Photo</label>
-        {% if user_details.profilephoto %}
-        <img src="{{ user_details.profilephoto.url }}" width="120"><br>
-        {% endif %}
-        <input type="file" name="profilephoto"><br><br>
-        
-        <label for="">FirstName</label>
-        <input type="text" name="first_name" id="first_name" value="{{ user_details.user.first_name }}"><br>
-        <label for="">LastName</label>
-        <input type="text"  name="last_name" value="{{ user_details.user.last_name }}"> <br>
-        <label for="">username</label>
-        <input type="text" name="username" value="{{ user_details.user.username }}"><br>
-        <label for="">email</label>
-        <input type="email" name="email" value="{{ user_details.user.email }}"><br>
-        <label for="">password</label>
-        <input type="password" name="password" value="{{ request.user.password }}"><br>
-        <label for="">address</label>
-        <textarea name="address"  rows="4" cols="40" >{{ user_details.address }}</textarea><br>
-        <label for="">City</label>
-        <input type="text" name="city" value="{{ user_details.city }}"><br>
-        <label for="">state</label>
-        <input type="text" name="state" value="{{ user_details.state }}"><br>
-        <label for="">phone</label>
-        <input type="text" name="phone" value="{{ user_details.phonenumber }}"><br>
-        <label for="">postal_code</label>
-        <input type="text" name="postal_code" value="{{ user_details.postal_code}}"><br>
-        <input type="submit">
-    </form>
-
-
-
-
-</body>
-</html>
+        <form action="{% url 'edituser' %}" enctype="multipart/form-data" method="post">
+            {% csrf_token %}
+            
+            <div class="form-group" style="text-align: center;">
+                <label>Profile Photo</label>
+                {% if user_details.profilephoto %}
+                    <img src="{{ user_details.profilephoto.url }}" class="profile-preview"><br>
+                {% endif %}
+                <input type="file" name="profilephoto" class="form-control">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ user_details.user.first_name }}">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ user_details.user.last_name }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" value="{{ user_details.user.username }}">
+            </div>
+            
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" class="form-control" value="{{ user_details.user.email }}">
+            </div>
+            
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" class="form-control" rows="4">{{ user_details.address }}</textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" class="form-control" value="{{ user_details.city }}">
+                </div>
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state" class="form-control" value="{{ user_details.state }}">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" class="form-control" value="{{ user_details.phonenumber }}">
+                </div>
+                <div class="form-group">
+                    <label>Postal Code</label>
+                    <input type="text" name="postal_code" class="form-control" value="{{ user_details.postal_code }}">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-save">Update Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

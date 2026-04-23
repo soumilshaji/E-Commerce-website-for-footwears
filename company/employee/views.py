@@ -37,19 +37,25 @@ def form(request):
         STATE=request.POST['state']
         PHONE=request.POST['phone']
         POSTAL_CODE=request.POST['postal_code']
-        if User.objects.filter(username=USERNAME).exists():
-            messages.error(request,'username already exist')
-        if User.objects.filter(email=EMAIL).exists():
-            messages.error(request,'email already exist')
-            
-        u=User.objects.create_user(first_name=FRISTNAME,last_name=LASTNAME,username=USERNAME,password=password,email=EMAIL)
-        u.save()
-        customer=Register.objects.create(user=u,address=ADDRESS,phonenumber=PHONE,postal_code=POSTAL_CODE,state=STATE,profilephoto=PROFILE,city=CITY)
-        customer.save()
-        customer_obj,create=Group.objects.get_or_create(name='CUSTOMER')
-        customer_obj.user_set.add(u)
-        messages.success(request,'Registration wa successfull..')
 
+        if User.objects.filter(username=USERNAME).exists():
+            messages.error(request, 'Username already exists.')
+            return render(request, 'common/register.html')
+        if User.objects.filter(email=EMAIL).exists():
+            messages.error(request, 'Email already exists.')
+            return render(request, 'common/register.html')
+
+        u = User.objects.create_user(first_name=FRISTNAME, last_name=LASTNAME, username=USERNAME, password=password, email=EMAIL)
+        u.save()
+        customer = Register.objects.create(user=u, address=ADDRESS, phonenumber=PHONE, postal_code=POSTAL_CODE, state=STATE, profilephoto=PROFILE, city=CITY)
+        customer.save()
+        customer_obj, created = Group.objects.get_or_create(name='CUSTOMER')
+        customer_obj.user_set.add(u)
+
+        # Auto-login the new user and redirect to the shop
+        login(request, u)
+        messages.success(request, f'Welcome, {u.first_name}! Your account has been created.')
+        return redirect('userhome')
 
     return render(request, 'common/register.html')
 
@@ -58,72 +64,205 @@ def login_user(request):
         if request.user.groups.filter(name='CUSTOMER').exists():
             return redirect('userhome')
         else:
-            return  redirect('adminhome')
+            return redirect('adminhome')
     if request.method == 'POST':
         username=request.POST['username']
         password=request.POST['password']
         user=authenticate(request,username=username,password=password)
         if user is not None:
             if user.groups.filter(name='CUSTOMER').exists():
-                login(request,user)
+                login(request, user)
                 return redirect('userhome')
             else:
-                return  redirect('adminhome')
+                # Manager login: ensure is_staff is set, then log in
+                if not user.is_staff:
+                    user.is_staff = True
+                    user.save()
+                login(request, user)
+                return redirect('adminhome')
         else:
             messages.error(request,'Invalid username or passsword')
             
     return render(request, 'common/login.html')
 
 
+from django.core.paginator import Paginator
+from django.db.models import Q
+
 def userhome(request):
-    data=Product.objects.all().order_by('category__name', 'name')
-    c=Category.objects.all()
-    search=request.GET.get('search')
-    category=request.GET.get('category')
+    # Exclude specifically the Yonex Power Cushion and all premium products
+    data = Product.objects.filter(category__is_premium=False).exclude(name__icontains="Yonex Power Cushion 220")
+    c = Category.objects.filter(is_premium=False)
+    
+    search = request.GET.get('search')
+    category_param = request.GET.get('category')
+    
     if search:
-        data=data.filter(name__icontains=search)
-    if category:
-        data=data.filter(category_id=category)
+        data = data.filter(name__icontains=search)
+    if category_param:
+        if category_param.isdigit():
+            data = data.filter(category_id=category_param)
+        else:
+            data = data.filter(category__name__icontains=category_param)
+            
+    # Use stable ordering for pagination consistency (newest first)
+    data = data.order_by('-id')
+
+    # Pagination: 15 products per page (5 columns × 3 rows)
+    paginator = Paginator(data, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     if request.user.is_authenticated:
-        w=Wishlist.objects.filter(user=request.user).values_list('product_id',flat=True)
+        w = Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True)
     else:
-        w=[]
-    return render(request, 'user/userhome.html', {'data':data,'c':c,'w':w})
+        w = []
+        
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'user/product_grid.html', {
+            'page_obj': page_obj, 
+            'w': w,
+            'search': search,
+            'category_param': category_param
+        })
+        
+    return render(request, 'user/userhome.html', {
+        'page_obj': page_obj, 
+        'c': c, 
+        'w': w,
+        'search': search,
+        'category_param': category_param
+    })
+
+def special_category_view(request):
+    data = Product.objects.filter(category__is_premium=True)
+    c = Category.objects.filter(is_premium=True) # For search/filter dropdown
+    
+    search = request.GET.get('search')
+    if search:
+        if ',' in search:
+            terms = search.split(',')
+            query = Q()
+            for term in terms:
+                term = term.strip()
+                query |= Q(name__icontains=term) | Q(category__name__icontains=term)
+            data = data.filter(query)
+        else:
+            data = data.filter(Q(name__icontains=search) | Q(category__name__icontains=search))
+    
+    sort = request.GET.get('sort')
+    if sort == 'price_low':
+        data = data.order_by('price')
+    elif sort == 'price_high':
+        data = data.order_by('-price')
+    elif sort == 'oldest':
+        data = data.order_by('id')
+    else:
+        # Default: newest first
+        data = data.order_by('-id')
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    if request.user.is_authenticated:
+        w = Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True)
+    else:
+        w = []
+        
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'user/product_grid.html', {
+            'page_obj': page_obj, 
+            'w': w,
+            'search': search,
+            'special_view': True
+        })
+        
+    return render(request, 'user/special_category.html', {
+        'page_obj': page_obj, 
+        'c': c, 
+        'w': w,
+        'search': search,
+    })
 
 # ///////////////////////////////////////////////////////////////////////////////////
 
 
 
 def productdetails(request, id):
-    product = get_object_or_404(Product,id=id)
-    r=review.objects.filter(product=product)
-    return render(request, 'user/productdetails.html', {'product': product,'r':r})
+    product = get_object_or_404(Product, id=id)
+    r = review.objects.filter(product=product)
+    # Fetch 4 related products from the same category, excluding current product
+    related_products = Product.objects.filter(category=product.category).exclude(id=id)[:4]
+    return render(request, 'user/productdetails.html', {
+        'product': product,
+        'r': r,
+        'related_products': related_products
+    })
 
 
 
 def addtocart(request,id):
+    if not request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'login_required'}, status=401)
+        messages.warning(request, "Please login to add items to cart")
+        return redirect('login_user')
+
     if request.method == 'POST':
         product=get_object_or_404(Product,id=id)
         quantity=int(request.POST.get('quantity', 1))
-        
+        size=request.POST.get('size', '').strip()
+
         cart, created = Cart.objects.get_or_create(user=request.user)
-        
-        cart_item,created=CartItem.objects.get_or_create(
+
+        # Different sizes are treated as separate cart items
+        cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
             product=product,
-            defaults={'quantity':quantity}
-            
+            size=size,
+            defaults={'quantity': quantity}
         )
         if not created:
-            new_quantity=cart_item.quantity+quantity
-            if new_quantity<=product.stock:
-                cart_item.quantity=new_quantity
+            new_quantity = cart_item.quantity + quantity
+            if new_quantity <= product.stock:
+                cart_item.quantity = new_quantity
             else:
-                cart_item.quantity=product.stock
+                cart_item.quantity = product.stock
             cart_item.save()
-            
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success', 'product_name': product.name})
+
     return redirect('cartitems')
-        
+
+
+def buy_now(request, id):
+    """Add product to cart and go directly to checkout."""
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please login to purchase.")
+        return redirect('login_user')
+
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=id)
+        quantity = int(request.POST.get('quantity', 1))
+        size = request.POST.get('size', '').strip()
+
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=product,
+            size=size,
+            defaults={'quantity': quantity}
+        )
+        if not created:
+            new_quantity = cart_item.quantity + quantity
+            cart_item.quantity = min(new_quantity, product.stock)
+            cart_item.save()
+
+    return redirect('checkout')
+
+
         
 def cartitems(request):
     cart = Cart.objects.filter(user=request.user).first()
@@ -193,7 +332,8 @@ def cash_on_delivery(request):
             order=order,
             product=item.product,
             price=item.product.price,
-            quantity=item.quantity
+            quantity=item.quantity,
+            size=item.size
         )
         item.product.stock -=item.quantity
         item.product.save()
@@ -210,10 +350,27 @@ def vieworder(request):
     for item in orders:
         item.total = item.product.price * item.quantity
     return render(request,'user/vieworder.html',{'orders':orders})
+
+def clear_order_history(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        # Delete all orders for this user (OrderItems cascade automatically)
+        Order.objects.filter(user=request.user).delete()
+        messages.success(request, 'Your order history has been cleared.')
+    return redirect('vieworder')
+
     
 def orderdetails(request,id):
-    order = Order.objects.get(id=id)
+    order = get_object_or_404(Order, id=id)
     items = OrderItem.objects.filter(order=order)
+    
+    if request.method == 'POST' and 'cancel_order' in request.POST:
+        if order.orderstatus.lower() not in ['completed', 'canceled']:
+            order.orderstatus = 'canceled'
+            order.paymentstatus = 'Failed'
+            order.cancel_reason = request.POST.get('cancel_reason', '')
+            order.save()
+            messages.warning(request, f'Order #{order.id:06d} has been cancelled.')
+        return redirect('vieworder')
     
     return render(request,'user/orderdetails.html',{'order':order,'items':items})
 
@@ -292,7 +449,8 @@ def payment_success(request):
             order=order,
             product=item.product,
             price=item.product.price,
-            quantity=item.quantity        
+            quantity=item.quantity,
+            size=item.size
         )
         item.product.stock -= item.quantity
         item.product.save()
@@ -380,7 +538,10 @@ def add_to_wishlist(request,id):
         )
         added = True
         
-    return JsonResponse({'status': 'success', 'added': added})
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'success', 'added': added})
+    
+    return redirect(request.META.get('HTTP_REFERER', 'wishlistview'))
 
 
 def wishlistview(request):
@@ -391,6 +552,10 @@ def wishlistview(request):
 
 
 def add_review(request,id):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please login to share your review")
+        return redirect('login_user')
+
     if request.method == "POST":
         comment=request.POST.get('comment')
         rating=request.POST.get('rating')
@@ -404,3 +569,6 @@ def add_review(request,id):
             rating=rating
         )
     return redirect('productdetails',id=id)
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)

@@ -1,150 +1,154 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Product</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+{% extends 'common/base.html' %}
+{% load static %}
 
-        .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
+{% block content %}
+<style>
+    .admin-form-wrapper {
+        background-color: #f8fafc;
+        padding: 60px 20px;
+        min-height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .form-container h2 {
-            margin-bottom: 25px;
-            color: #333;
-            text-transform: uppercase;
-        }
+    .admin-form-container {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        width: 100%;
+        max-width: 600px;
+        border: 1px solid #e2e8f0;
+    }
 
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
+    .admin-form-container h2 {
+        margin-bottom: 30px;
+        color: #1e293b;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-align: center;
+    }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-            font-size: 14px;
-        }
+    .form-field {
+        margin-bottom: 20px;
+    }
 
-        .input-group input[type="text"],
-        .input-group input[type="number"],
-        .input-group input[type="file"],
-        .input-group select,
-        .input-group textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+    .form-field label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #64748b;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-        .input-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+    .admin-form-container input[type="text"],
+    .admin-form-container input[type="number"],
+    .admin-form-container input[type="file"],
+    .admin-form-container select,
+    .admin-form-container textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 15px;
+        transition: all 0.2s;
+    }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background: green;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
+    .admin-form-container input:focus, .admin-form-container select:focus, .admin-form-container textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
 
-        button:hover {
-            background: darkgreen;
-        }
+    .btn-admin-submit {
+        width: 100%;
+        padding: 14px;
+        background: #059669;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
 
-        .back-link {
-            display: block;
-            margin-top: 15px;
-            color: #555;
-            text-decoration: none;
-            font-size: 14px;
-        }
+    .btn-admin-submit:hover {
+        background: #047857;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
+    .back-nav {
+        display: block;
+        margin-top: 25px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+    }
 
-    <div class="form-container">
-        <h2>Add Product</h2>
-        <form action="{% url 'add_product' %}" enctype="multipart/form-data" method="post">
+    .back-nav:hover {
+        color: #2563eb;
+    }
+</style>
+
+<div class="admin-form-wrapper">
+    <div class="admin-form-container">
+        <h2>{% if is_special %}Add Premium Product (Athletic/Indoor){% else %}Add New Product{% endif %}</h2>
+        <form action="{% if is_special %}{% url 'add_product' %}?special=true{% else %}{% url 'add_product' %}{% endif %}" enctype="multipart/form-data" method="post">
             {% csrf_token %}
             
-            <div class="input-group">
-                <label>Product Photo</label>
+            <div class="form-field">
+                <label>Product Photography</label>
                 <input type="file" name="image" required>
             </div>
             
-            <div class="input-group">
-                <label>Name</label>
-                <input type="text" name="name" placeholder="Enter product name" required>
+            <div class="form-field">
+                <label>Product Name</label>
+                <input type="text" name="name" placeholder="e.g. Urban Runner X1" required>
             </div>
             
-            <div class="input-group">
-                <label>Price</label>
-                <input type="text" name="price" placeholder="Enter selling price" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-field">
+                    <label>Price (₹)</label>
+                    <input type="text" name="price" placeholder="0.00" required>
+                </div>
+                
+                <div class="form-field">
+                    <label>Initial Stock</label>
+                    <input type="number" name="stock" placeholder="0" required>
+                </div>
             </div>
             
-            <div class="input-group">
-                <label>Stock</label>
-                <input type="number" name="stock" placeholder="Enter available stock" required>
-            </div>
-            
-            <div class="input-group">
-                <label>Category</label>
+            <div class="form-field">
+                <label>Category Assignment</label>
                 <select name="category" required>
-                    <option value="" disabled selected>Select Category</option>
+                    <option value="" disabled selected>Select a category...</option>
                     {% for i in c %}
                     <option value="{{i.id}}">{{i.name}}</option>
                     {% endfor %}
                 </select>
             </div>
             
-            <div class="input-group">
-                <label>Description</label>
-                <textarea name="description" placeholder="Product details..."></textarea>
+            <div class="form-field">
+                <label>Product Description</label>
+                <textarea name="description" rows="4" placeholder="Highlight key features and materials..."></textarea>
             </div>
             
-            <button type="submit">Add Product</button>
+            <button type="submit" class="btn-admin-submit">Publish Product</button>
         </form>
-        <a href="{% url 'adminhome' %}" class="back-link">&larr; Back to Admin Home</a>
+        <a href="{% url 'adminhome' %}" class="back-nav">&larr; Back to Management Console</a>
     </div>
-
-    {% if messages %}
-        {% for msg in messages %}
-        <script>alert('{{msg}}')</script>
-        {% endfor %}
-    {% endif %}
-
-</body>
-</html>
+</div>
+{% endblock %}

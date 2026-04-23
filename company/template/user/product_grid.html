@@ -1,0 +1,72 @@
+<div class="product-grid">
+    {% for i in page_obj %}
+        <div class="product-item">
+            <div class="product-image-container">
+                <!-- Minimalist Wishlist Icon -->
+                {% if i.id in w %}
+                    <a href="javascript:void(0);" class="heart-icon-minimal wishlist-toggle" data-id="{{ i.id }}" title="Remove from wishlist" style="opacity: 1;">❤️</a>
+                {% else %}
+                    <a href="javascript:void(0);" class="heart-icon-minimal wishlist-toggle" data-id="{{ i.id }}" title="Add to wishlist">🤍</a>
+                {% endif %}
+
+                
+
+                <!-- Image Link -->
+                <a href="{% url 'productdetails' i.id %}" class="w-100 h-100 d-flex align-items-center justify-content-center text-decoration-none">
+                    {% if i.image %}
+                        <img src="{{ i.image.url }}" alt="{{ i.name }}" class="product-image">
+                    {% else %}
+                        <i class="fas fa-box fa-3x text-muted opacity-25"></i>
+                    {% endif %}
+                </a>
+
+            </div>
+
+            <div class="product-details">
+                <a href="{% url 'productdetails' i.id %}" class="product-name">{{ i.name }}</a>
+                <div class="product-price-layout">
+                    <span class="current-price">₹{{ i.price|floatformat:2 }}</span>
+                    <!-- Simulating original price strictly for UI match to screenshot -->
+                    <span class="original-price">₹{{ i.price|add:"500"|floatformat:2 }}</span> 
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if not page_obj %}
+<div class="text-center py-5">
+    <h3 class="fw-bold">No products found</h3>
+    <p class="text-muted">Try adjusting your search or brand filters.</p>
+    <a href="{% url 'userhome' %}" class="btn btn-dark rounded-pill px-4 mt-3">Reset Filters</a>
+</div>
+{% endif %}
+
+{% if page_obj.has_other_pages %}
+<div class="pagination-container">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if category_param %}&category={{ category_param }}{% endif %}" class="page-pill">&larr; Prev</a>
+    {% else %}
+        <span class="page-pill disabled">&larr; Prev</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a href="#" class="page-circle active" onclick="return false;">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if category_param %}&category={{ category_param }}{% endif %}" class="page-circle">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.number < page_obj.paginator.num_pages|add:'-2' %}
+        <span class="page-dots">...</span>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if category_param %}&category={{ category_param }}{% endif %}" class="page-circle">{{ page_obj.paginator.num_pages }}</a>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if category_param %}&category={{ category_param }}{% endif %}" class="page-pill">Next &rarr;</a>
+    {% else %}
+         <span class="page-pill disabled">Next &rarr;</span>
+    {% endif %}
+</div>
+{% endif %}

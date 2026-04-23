@@ -1,42 +1,251 @@
-<!-- done -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    {% for k in pdata %} 
-     <form action="{% url 'edit_product' k.id  %}" enctype="multipart/form-data" method="post">
-        {% csrf_token  %}
-<label>Product Photo</label><br>
+{% extends 'common/base.html' %}
+{% load static %}
 
-{% if k.image %}
-<img src="{{k.image.url}}" width="150"><br>
-{% endif %}
+{% block content %}
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gray: #f8fafc;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --surface: #ffffff;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
 
-<input type="file" name="image"><br>
-        <label for="">Name</label>
-        <input type="text" name="Name" value="{{k.Name}}"><br>
-        <label for="">Price</label>
-        <input type="text"  name="price" value="{{k.Price}}"> <br>
-        <label for="">stock</label>
-        <input type="number" name="stock" value="{{k.stock}}"><br>
-        <label for="">category</label>
-        <select name="category" id="">
-            <option value="{{k.category_id}}">{{k.category.Name}}</option>
-            {% for i in c  %}
-            <option value="{{i.id}}">{{i.Name}}</option>
+        .edit-wrapper {
+            background-color: var(--bg-gray);
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
+
+        .edit-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .edit-card {
+            background-color: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .edit-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .edit-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: var(--text-dark);
+        }
+
+        .edit-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .edit-card input[type="text"],
+        .edit-card input[type="number"],
+        .edit-card select,
+        .edit-card textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-dark);
+            background-color: #fff;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .edit-card input:focus, .edit-card select:focus, .edit-card textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .image-preview-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+        }
+
+        .preview-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #fff;
+            border: 1px solid var(--border);
+        }
+
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .file-input-wrapper {
+            flex-grow: 1;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .edit-card {
+                padding: 25px;
+            }
+        }
+    </style>
+
+    <div class="edit-wrapper">
+        <div class="edit-container">
+            {% for k in pdata %} 
+            <div class="edit-card">
+                <div class="edit-header">
+                    <h1>Edit Product</h1>
+                    <p>Modify details for <strong>{{k.name}}</strong></p>
+                </div>
+
+                <form action="{% url 'edit_product' k.id %}" enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="image-preview-section">
+                        <div class="preview-box">
+                            {% if k.image %}
+                                <img src="{{k.image.url}}" alt="preview">
+                            {% else %}
+                                <div style="height:100%; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:12px;">No Photo</div>
+                            {% endif %}
+                        </div>
+                        <div class="file-input-wrapper">
+                            <label>Change Product Photo</label>
+                            <input type="file" name="image">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="name">Product Name</label>
+                            <input type="text" id="name" name="name" value="{{k.name}}" required placeholder="Enter product name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price (₹)</label>
+                            <input type="text" id="price" name="price" value="{{k.price}}" required placeholder="999.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stock">Stock Level</label>
+                            <input type="number" id="stock" name="stock" value="{{k.stock}}" required>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="category">Category</label>
+                            <select name="category" id="category">
+                                <option value="{{k.category_id}}" selected>{{k.category.name}}</option>
+                                {% for i in c %}
+                                    {% if i.id != k.category_id %}
+                                        <option value="{{i.id}}">{{i.name}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" rows="5" required placeholder="Describe the product features...">{{k.description}}</textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Update Product Specifications</button>
+                </form>
+                
+                <a href="{% url 'view_product' %}" class="back-link">&larr; Back to Product Inventory</a>
+            </div>
             {% endfor %}
-        </select><br>
-        <label for="">description</label><br>
-        <textarea name="description" rows="4" cols="40">{{k.Description}}</textarea><br>
-        <input type="submit">
-    </form>
-    {% endfor %}
-
-
-
-</body>
-</html>
+        </div>
+    </div>
+{% endblock %}

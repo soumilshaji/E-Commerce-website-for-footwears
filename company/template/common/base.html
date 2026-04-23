@@ -22,6 +22,131 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,900;1,900&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"
     rel="stylesheet">
+  <style>
+    :root {
+      --brand-navy: #003049;
+      --brand-red: #D62828;
+      --brand-orange: #F77F00;
+      --brand-yellow: #FCBF49;
+      --primary-orange: var(--brand-orange);
+      --hero-orange: #C04E01;
+    }
+    .hero-orange-container {
+      background-color: var(--hero-orange);
+      border-radius: 0 0 60px 60px; /* Slightly less rounding */
+      padding: 0 0 40px 0; /* Reduced from 100px */
+      position: relative;
+      overflow: hidden;
+      margin-top: -100px; /* Adjusted from -120px */
+      z-index: 1;
+    }
+    .header-nav-transparent {
+      background: transparent !important;
+      position: relative;
+      z-index: 100;
+      border: none !important;
+    }
+    .curved-nav-box {
+      background: #ffffff;
+      border-radius: 50px;
+      padding: 5px 10px; /* Adjusted for sliding pill */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border: none;
+      margin: 15px 0;
+      position: relative; /* Crucial for absolute pill */
+      display: flex;
+      align-items: center;
+    }
+    .nav-sliding-pill {
+      position: absolute;
+      height: 40px;
+      background: var(--primary-orange);
+      border-radius: 30px;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      z-index: 0;
+      pointer-events: none; /* Don't block clicks */
+      opacity: 0;
+    }
+    .nav-item {
+      position: relative;
+      z-index: 1;
+    }
+    .nav-item .nav-link {
+      padding: 10px 20px !important;
+      transition: all 0.3s ease;
+      color: var(--brand-navy) !important;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      position: relative;
+      z-index: 2;
+    }
+    /* Active link text color */
+    .nav-item .nav-link.active-pill,
+    .nav-item:hover .nav-link {
+      color: #000 !important;
+      text-shadow: 0 0 1px var(--brand-yellow);
+    }
+    .user-icon-circle {
+      background: #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .user-icon-circle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .cart-badge-orange {
+      background: var(--brand-orange);
+      color: #fff;
+      font-size: 0.7rem;
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      border-radius: 50%;
+      padding: 2px 6px;
+    }
+    #footer {
+      background-color: var(--brand-navy);
+      color: rgba(255,255,255,0.8);
+      border-top: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    #footer a {
+      color: rgba(255,255,255,0.6);
+      transition: all 0.3s ease;
+    }
+    #footer a:hover {
+      color: var(--brand-yellow);
+    }
+    #footer .widget-title {
+      color: var(--brand-yellow);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #footer .text-muted {
+      color: rgba(255,255,255,0.5) !important;
+    }
+    @media (max-width: 991px) {
+      .hero-orange-container {
+        border-radius: 0 0 40px 40px;
+        margin-top: 0;
+      }
+      .curved-nav-box {
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -48,7 +173,8 @@
     </symbol>
     <symbol xmlns="http://www.w3.org/2000/svg" id="nav-icon" viewBox="0 0 16 16">
       <path
-        d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5z" />
+        d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5z" 
+        fill="var(--brand-navy)" />
     </symbol>
     <symbol xmlns="http://www.w3.org/2000/svg" id="close" viewBox="0 0 16 16">
       <path
@@ -172,9 +298,6 @@
             </ul>
           </div>
           <div class="col d-none d-md-block">
-            <p class="text-center text-black m-0"><strong>Special Offer</strong>: Free Shipping on all the orders above
-              $100
-            </p>
           </div>
           <div class="col">
             <ul class="d-flex justify-content-end gap-3 list-unstyled m-0">
@@ -190,11 +313,12 @@
         </div>
       </div>
     </div>
-    <nav id="header-nav" class="navbar navbar-expand-lg">
+    <nav id="header-nav" class="navbar navbar-expand-lg header-nav-transparent">
       <div class="container-lg">
         <a class="navbar-brand fw-bold fs-3 text-uppercase"
-          href="{% if request.user.is_authenticated %}{% url 'userhome' %}{% else %}{% url 'home' %}{% endif %}"
-          style="text-decoration: none; color: inherit;">
+          href="http://127.0.0.1:8000/"
+          style="text-decoration: none; color: {% if request.resolver_match.url_name == 'home' %}#fff{% else %}#000{% endif %};"
+        >
           UrbanSole
         </a>
         <button class="navbar-toggler d-flex d-lg-none order-3 border-0 p-1 ms-2" type="button"
@@ -207,60 +331,88 @@
         <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar">
           <div class="offcanvas-header px-4 pb-0">
             <a class="navbar-brand fw-bold fs-3 text-uppercase"
-              href="{% if request.user.is_authenticated %}{% url 'userhome' %}{% else %}{% url 'home' %}{% endif %}"
-              style="text-decoration: none; color: inherit;">
+              href="http://127.0.0.1:8000/"
+              style="text-decoration: none; color: inherit;"
+            >
               UrbanSole
             </a>
             <button type="button" class="btn-close btn-close-black p-5" data-bs-dismiss="offcanvas" aria-label="Close"
               data-bs-target="#bdNavbar"></button>
           </div>
           <div class="offcanvas-body">
-            <ul id="navbar" class="navbar-nav fw-bold justify-content-end align-items-center flex-grow-1">
-              {% if request.user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'userhome' %}">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'cartitems' %}">Cart</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'wishlistview' %}">Wishlist</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'userdetails' %}">Profile</a>
-              </li>
+            <ul id="navbar" class="navbar-nav fw-bold justify-content-center align-items-center flex-grow-1 curved-nav-box">
+              <div class="nav-sliding-pill"></div>
+              {% if user.is_authenticated %}
+                {% if not user.is_staff %}
+                {# --- CUSTOMER NAV --- #}
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'home' %}active-pill{% endif %}" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'userhome' or request.resolver_match.url_name == 'productdetails' %}active-pill{% endif %}" href="{% url 'userhome' %}">Items</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'wishlistview' %}active-pill{% endif %}" href="{% url 'wishlistview' %}">Wishlist</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'cartitems' %}active-pill{% endif %}" href="{% url 'cartitems' %}">Cart</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'vieworder' or request.resolver_match.url_name == 'orderdetails' %}active-pill{% endif %}" href="{% url 'vieworder' %}">Orders</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'userdetails' %}active-pill{% endif %}" href="{% url 'userdetails' %}">Profile</a>
+                </li>
+                {% if user.is_staff %}
+                <li class="nav-item">
+                  <a class="nav-link me-5 text-primary fw-bold {% if request.resolver_match.url_name == 'adminhome' %}active-pill{% endif %}" href="{% url 'adminhome' %}">Dashboard</a>
+                </li>
+                {% endif %}
+                {% else %}
+                {# --- MANAGER NAV --- #}
+                <li class="nav-item">
+                  <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'adminhome' %}active-pill{% endif %}" href="{% url 'adminhome' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-2" href="{% url 'logout' %}">Home</a>
+                </li>
+                {% endif %}
               {% else %}
+              {# --- GUEST NAV --- #}
               <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'home' %}">Home</a>
+                <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'home' %}active-pill{% endif %}" href="{% url 'home' %}">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'login_user' %}">Login</a>
+                <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'login_user' %}active-pill{% endif %}" href="{% url 'login_user' %}">Login</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link me-5" href="{% url 'form' %}">Register</a>
+                <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'form' %}active-pill{% endif %}" href="{% url 'form' %}">Register</a>
               </li>
               {% endif %}
             </ul>
           </div>
         </div>
-        <div class="user-items ps-0 ps-md-5">
-          <ul class="d-flex justify-content-end list-unstyled align-item-center m-0">
-            {% if request.user.is_authenticated %}
-            <li class="pe-3">
-              <a href="{% url 'logout' %}" class="border-0 text-danger fw-bold" style="text-decoration: none;">
-                Logout
-              </a>
-            </li>
+        <div class="user-items ps-0 ps-md-5 d-flex align-items-center gap-3">
+          {% if user.is_authenticated %}
+            {% if not user.is_staff %}
+            {# Customer icons: logout, profile, cart #}
+            <a href="{% url 'logout' %}" class="btn btn-link fw-bold px-3 {% if request.resolver_match.url_name == 'home' %}text-white-50{% else %}text-black{% endif %}" style="text-decoration: none; font-size: 0.8rem;">LOGOUT</a>
+            <a href="{% url 'userdetails' %}" class="user-icon-circle">
+              <svg class="user" width="20" height="20">
+                <use xlink:href="#user"></use>
+              </svg>
+            </a>
+            <a href="{% url 'cartitems' %}" class="user-icon-circle position-relative">
+              <svg class="cart" width="20" height="20">
+                <use xlink:href="#shopping-cart"></use>
+              </svg>
+              <span class="cart-badge-orange">5</span>
+            </a>
+            {% else %}
+            {# Manager: just a logout button #}
+            <a href="{% url 'logout' %}" class="btn btn-link fw-bold px-3 text-danger" style="text-decoration: none; font-size: 0.8rem;">LOGOUT</a>
             {% endif %}
-            <li>
-              <a href="#" class="search-item border-0" data-bs-toggle="collapse" data-bs-target="#search-box"
-                aria-label="Toggle navigation">
-                <svg class="search" width="24" height="24">
-                  <use xlink:href="#search"></use>
-                </svg>
-              </a>
-            </li>
-          </ul>
+          {% endif %}
         </div>
       </div>
     </nav>
@@ -280,7 +432,7 @@
                 <a href="#">Track Your Order</a>
               </li>
               <li class="pb-2">
-                <a href="index.html">Our Blog</a>
+                <a href="{% url 'userhome' %}">Our Blog</a>
               </li>
               <li class="pb-2">
                 <a href="#">Privacy policy</a>
@@ -337,7 +489,7 @@
                 <a href="#">Track Your Order</a>
               </li>
               <li class="pb-2">
-                <a href="index.html">Our Blog</a>
+                <a href="{% url 'userhome' %}">Our Blog</a>
               </li>
               <li class="pb-2">
                 <a href="#">Privacy policy</a>
@@ -371,7 +523,7 @@
                 <a href="#">Best Sales</a>
               </li>
               <li class="pb-2">
-                <a href="index.html">Stores</a>
+                <a href="{% url 'userhome' %}">Stores</a>
               </li>
               <li class="pb-2">
                 <a href="#" data-bs-toggle="modal" data-bs-target="#modallogin">Login</a>
@@ -390,7 +542,7 @@
                 <a href="#">Delivery</a>
               </li>
               <li class="pb-2">
-                <a href="index.html">About Us</a>
+                <a href="{% url 'userhome' %}">About Us</a>
               </li>
               <li class="pb-2">
                 <a href="#">Shoes</a>
@@ -406,7 +558,7 @@
             <h5 class="widget-title pb-3">Get In Touch</h5>
             <div class="footer-contact-text">
               <span>UrbanSole Online Store 123 Main Street, Toulouse - France. </span>
-              <span> Call us: (+33) 800 456 789-987 </span>
+              <span> Call us: (+91) xxxxx xxxxx </span>
               <span class="text-hover fw-bold light-border"><a
                   href="mailto:contact@yourwebsite.com">contact@yourwebsite.com</a></span>
             </div>
@@ -427,13 +579,130 @@
   </footer>
   <script src="{%static 'stylish-1.0.0/js/jquery-1.11.0.min.js'%}"></script>
   <script src="{%static 'stylish-1.0.0/js/plugins.js'%}"></script>
-  <script src="{%static 'stylish-1.0.0/js/script.js'%}"></script>
+  <script src="{%static 'stylish-1.0.0/js/script.js'%}?v=1.3"></script>
 
   {% if messages %}
   {% for msg in messages %}
   <script>alert('{{msg}}')</script>
   {% endfor %}
   {% endif %}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navPill = document.querySelector('.nav-sliding-pill');
+      const navLinks = document.querySelectorAll('.nav-link');
+      const navbar = document.querySelector('#navbar');
+      
+      function movePill(target) {
+        if (!target) return;
+        const rect = target.getBoundingClientRect();
+        const navRect = navbar.getBoundingClientRect();
+        
+        navPill.style.width = `${rect.width}px`;
+        navPill.style.left = `${rect.left - navRect.left}px`;
+        navPill.style.opacity = '1';
+      }
+
+      function updateActivePill() {
+        const activeLink = document.querySelector('.nav-link.active-pill');
+        if (activeLink) {
+          movePill(activeLink);
+        } else {
+          navPill.style.opacity = '0';
+        }
+      }
+
+      // Initial position with a slight delay for layout stabilization
+      setTimeout(updateActivePill, 200);
+
+      navLinks.forEach(link => {
+        link.addEventListener('mouseenter', (e) => {
+          movePill(e.target);
+        });
+      });
+
+      navbar.addEventListener('mouseleave', updateActivePill);
+
+      // Handle window resize to keep pill aligned
+      window.addEventListener('resize', updateActivePill);
+    });
+  </script>
+
+  <!-- Floating Scroll Button -->
+  <button id="scroll-fab" title="Scroll to Bottom" onclick="scrollFab()">&#8595;</button>
+
+  <style>
+    #scroll-fab {
+      position: fixed;
+      bottom: 32px;
+      right: 28px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #fff;
+      font-size: 22px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+      pointer-events: none;
+    }
+    #scroll-fab.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+    #scroll-fab:hover {
+      transform: scale(1.15);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    }
+    #scroll-fab.at-bottom {
+      background: linear-gradient(135deg, #F77F00, #D62828);
+    }
+  </style>
+
+  <script>
+    const fab = document.getElementById('scroll-fab');
+    let isAtBottom = false;
+
+    function scrollFab() {
+      if (isAtBottom) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrolledDown = window.scrollY > 200;
+      const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+
+      fab.classList.toggle('visible', scrolledDown);
+
+      if (nearBottom) {
+        if (!isAtBottom) {
+          isAtBottom = true;
+          fab.innerHTML = '&#8593;';
+          fab.setAttribute('title', 'Back to Top');
+          fab.classList.add('at-bottom');
+        }
+      } else {
+        if (isAtBottom) {
+          isAtBottom = false;
+          fab.innerHTML = '&#8595;';
+          fab.setAttribute('title', 'Scroll to Bottom');
+          fab.classList.remove('at-bottom');
+        }
+      }
+    });
+  </script>
 
 </body>
 

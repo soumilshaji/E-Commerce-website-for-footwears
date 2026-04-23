@@ -24,7 +24,8 @@ class CartItem(models.Model):
     cart=models.ForeignKey(Cart,on_delete=models.CASCADE)    
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity=models.IntegerField()
-    
+    size=models.CharField(max_length=10, blank=True, default='')
+
 
 class Order(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -37,7 +38,7 @@ class Order(models.Model):
     paymentstatus=models.CharField(max_length=20, default='')
     trackingid=models.CharField(max_length=100, blank=True)
     payment_method=models.CharField(max_length=50, blank=True)    
-    
+    cancel_reason=models.TextField(blank=True, null=True)
     
     
 class OrderItem(models.Model):
@@ -45,6 +46,7 @@ class OrderItem(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity=models.IntegerField()
     price=models.IntegerField()
+    size=models.CharField(max_length=10, blank=True, default='')
 
 
 class Wishlist(models.Model):

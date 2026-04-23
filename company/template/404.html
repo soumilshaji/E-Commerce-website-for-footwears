@@ -1,0 +1,101 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .error-section {
+        padding: 100px 20px;
+        text-align: center;
+        background: #fff;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .error-code {
+        font-size: clamp(100px, 20vw, 200px);
+        font-weight: 900;
+        line-height: 1;
+        margin: 0;
+        background: linear-gradient(135deg, #000 0%, #444 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .error-text {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin: 20px 0 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .error-subtext {
+        font-size: 18px;
+        color: #666;
+        max-width: 500px;
+        margin: 0 auto 40px;
+        line-height: 1.6;
+    }
+
+    .btn-home {
+        background: #000;
+        color: #fff;
+        padding: 18px 40px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .btn-home:hover {
+        background: #333;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        color: #fff;
+    }
+
+    /* Animated background elements */
+    .bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.02);
+        z-index: -1;
+    }
+
+    .c1 { width: 300px; height: 300px; top: 10%; left: 5%; animation: pulse 8s infinite; }
+    .c2 { width: 200px; height: 200px; bottom: 10%; right: 5%; animation: pulse 12s infinite; }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.02; }
+        50% { transform: scale(1.2); opacity: 0.05; }
+    }
+</style>
+
+<div class="error-section">
+    <div class="bg-circle c1"></div>
+    <div class="bg-circle c2"></div>
+    
+    <h1 class="error-code">404</h1>
+    <h2 class="error-text">Page Not Found</h2>
+    <p class="error-subtext">
+        The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+    </p>
+    
+    <a href="{% url 'userhome' %}" class="btn-home">Return To Store</a>
+</div>
+{% endblock %}

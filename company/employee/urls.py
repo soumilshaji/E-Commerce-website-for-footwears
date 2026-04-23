@@ -12,6 +12,7 @@ urlpatterns = [
     path('productdetails/<int:id>/',views.productdetails,name='productdetails'),
     
     path('addtocart/<int:id>/',views.addtocart,name='addtocart'),
+    path('buy_now/<int:id>/', views.buy_now, name='buy_now'),
     path('cartitems/', views.cartitems, name='cartitems'),
     
     path('increase_quantity/<int:id>',views.increase_quantity,name='increase_quantity'),
@@ -22,6 +23,7 @@ urlpatterns = [
     
     path('ordersuccess/<int:id>',views.ordersuccess,name='ordersuccess'),
     path('vieworder',views.vieworder,name='vieworder'),
+    path('clear_order_history',views.clear_order_history,name='clear_order_history'),
     path('orderdetails/<int:id>/',views.orderdetails,name='orderdetails'),
     path('userdetails',views.userdetails,name='userdetails'),
     path('edituser',views.edituser,name='edituser'),
@@ -31,7 +33,8 @@ urlpatterns = [
     path('password-reset-confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
     path('add_to_wishlist/<int:id>',views.add_to_wishlist,name='add_to_wishlist'),
     path('wishlistview/',views.wishlistview,name='wishlistview'),
-    path('add_review/<int:id>',views.add_review,name='add_review')
+    path('add_review/<int:id>',views.add_review,name='add_review'),
+    path('special_category', views.special_category_view, name='special_category'),
 
 
 ]

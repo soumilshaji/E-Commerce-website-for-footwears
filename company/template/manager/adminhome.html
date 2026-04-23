@@ -1,106 +1,158 @@
+{% extends 'common/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("{% static 'stylish-1.0.0/images/card-image1.jpg' %}") no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #fff;
-        }
 
-        .dashboard-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+{% block content %}
+<style>
+    .admin-wrapper {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("{% static 'stylish-1.0.0/images/card-image1.jpg' %}") no-repeat center center;
+        background-size: cover;
+        background-attachment: fixed;
+        padding: 80px 20px;
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .dashboard-container h1 {
-            margin-bottom: 30px;
-            font-size: 32px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+    .admin-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 50px;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 700px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-        .button-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+    .admin-card h1 {
+        margin-bottom: 40px;
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
 
-        .admin-link {
-            display: inline-block;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
 
-        .admin-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
+    .glass-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        text-decoration: none !important;
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 700;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        letter-spacing: 0.5px;
+    }
 
-        .logout-link {
-            background: rgba(220, 53, 69, 0.6);
-            margin-top: 30px;
-            display: inline-block;
-            width: 100%;
-            box-sizing: border-box;
-            border-color: rgba(220, 53, 69, 0.8);
-        }
+    .glass-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        color: #fff;
+    }
 
-        .logout-link:hover {
-            background: rgba(220, 53, 69, 0.9);
+    .glass-link-large {
+        grid-column: 1 / -1;
+        background: rgba(37, 99, 235, 0.2);
+        border-color: rgba(37, 99, 235, 0.3);
+    }
+    
+    .glass-link-large:hover {
+        background: rgba(37, 99, 235, 0.4);
+    }
+
+    .logout-btn-wrap {
+        margin-top: 40px;
+    }
+
+    .btn-logout-glass {
+        padding: 12px 30px;
+        background: rgba(239, 68, 68, 0.2);
+        color: #fecaca;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 600;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        transition: all 0.3s;
+    }
+
+    .btn-logout-glass:hover {
+        background: rgba(239, 68, 68, 0.4);
+        color: #fff;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    @media (max-width: 600px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
         }
+    }
+</style>
+
+<div class="admin-wrapper">
+    <div class="admin-card">
+        <h1>Management Console</h1>
         
-        @media (max-width: 600px) {
-            .button-grid {
-                grid-template-columns: 1fr;
-            }
-            .admin-link[style*="grid-column: 1 / -1;"] {
-                grid-column: 1;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="dashboard-container">
-        <h1>Admin Dashboard</h1>
-        
-        <div class="button-grid">
-            <a href="{% url 'category' %}" class="admin-link">Add Category</a>
-            <a href="{% url 'view' %}" class="admin-link">View Categories</a>
-            <a href="{% url 'add_product' %}" class="admin-link">Add Product</a>
-            <a href="{% url 'view_product' %}" class="admin-link">View Products</a>
-            <a href="{% url 'userorder_for_admin' %}" class="admin-link" style="grid-column: 1 / -1;">Orders</a>
+        <div class="admin-grid">
+            <a href="{% url 'category' %}" class="glass-link">
+                <span style="font-size: 24px; margin-bottom: 8px;">📁</span>
+                Add Category
+            </a>
+            <a href="{% url 'category' %}?special=true" class="glass-link" style="background: rgba(247, 127, 0, 0.2); border-color: rgba(247, 127, 0, 0.3);">
+                <span style="font-size: 24px; margin-bottom: 8px;">👑</span>
+                Add Premium Category
+            </a>
+            <a href="{% url 'view' %}" class="glass-link">
+                <span style="font-size: 24px; margin-bottom: 8px;">🔍</span>
+                View Categories
+            </a>
+            <a href="{% url 'view' %}?special=true" class="glass-link" style="background: rgba(247, 127, 0, 0.2); border-color: rgba(247, 127, 0, 0.3);">
+                <span style="font-size: 24px; margin-bottom: 8px;">🔎</span>
+                View Premium Category
+            </a>
+            <a href="{% url 'add_product' %}" class="glass-link">
+                <span style="font-size: 24px; margin-bottom: 8px;">➕</span>
+                Add Product
+            </a>
+            <a href="{% url 'add_product' %}?special=true" class="glass-link" style="background: rgba(247, 127, 0, 0.2); border-color: rgba(247, 127, 0, 0.3);">
+                <span style="font-size: 24px; margin-bottom: 8px;">⭐</span>
+                Add Premium Product
+            </a>
+            <a href="{% url 'view_product' %}" class="glass-link">
+                <span style="font-size: 24px; margin-bottom: 8px;">👟</span>
+                View Products
+            </a>
+            <a href="{% url 'view_product' %}?special=true" class="glass-link" style="background: rgba(247, 127, 0, 0.2); border-color: rgba(247, 127, 0, 0.3);">
+                <span style="font-size: 24px; margin-bottom: 8px;">💎</span>
+                View Premium Products
+            </a>
+            <a href="{% url 'userorder_for_admin' %}" class="glass-link glass-link-large">
+                <span style="font-size: 24px; margin-bottom: 8px;">📦</span>
+                Manage Customer Orders
+            </a>
         </div>
         
-        <a href="{% url 'logout' %}" class="admin-link logout-link">Logout</a>
+        <div class="logout-btn-wrap">
+            <a href="{% url 'logout' %}" class="btn-logout-glass">Sign Out</a>
+        </div>
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}

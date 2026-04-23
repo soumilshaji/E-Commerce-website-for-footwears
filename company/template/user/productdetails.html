@@ -42,26 +42,93 @@
             </div>
           </div>
           
-          <!-- Add to Cart Form -->
-          <div class="d-flex align-items-center gap-4">
-            {% if product.stock > 0 %}
-              <form action="{% url 'addtocart' product.id %}" method="post" class="d-flex w-100 gap-3 align-items-center">
-                {% csrf_token %}
-                <div class="input-group" style="width: 140px;">
-                  <span class="input-group-text bg-white border-dark text-uppercase fw-bold" style="font-size: 0.8rem;">Qty</span>
-                  <input type="number" name="quantity" class="form-control border-dark text-center fw-bold" value="1" min="1" max="{{ product.stock }}">
-                </div>
-                <button type="submit" class="btn btn-black btn-lg text-uppercase hvr-sweep-to-right px-5 flex-grow-1" style="color: white !important;">Add to Cart</button>
-              </form>
+          <div class="mb-4">
+            <h5 class="text-uppercase fw-bold mb-3" style="font-size: 0.9rem; letter-spacing: 1px;">Select Size (UK)</h5>
+            <div class="d-flex flex-wrap gap-2 mb-4" id="size-options">
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 6" style="min-width: 60px;">UK 6</button>
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 7" style="min-width: 60px;">UK 7</button>
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 8" style="min-width: 60px;">UK 8</button>
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 9" style="min-width: 60px;">UK 9</button>
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 10" style="min-width: 60px;">UK 10</button>
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 11" style="min-width: 60px;">UK 11</button>
+              <button type="button" class="btn btn-outline-dark rounded-3 px-3 py-2 fw-bold size-btn" data-size="UK 12" style="min-width: 60px;">UK 12</button>
+            </div>
+            <p id="size-warning" class="text-danger" style="display:none; font-size:0.85rem;">⚠️ Please select a size before adding to cart.</p>
+          </div>
+          
+          <!-- Add to Cart + Buy Now -->
+          <div class="d-flex flex-column gap-3">
+            {% if user.is_authenticated %}
+              {% if product.stock > 0 %}
+                <!-- Add to Cart -->
+                <form action="{% url 'addtocart' product.id %}" method="post" class="d-flex w-100 gap-3 align-items-center" id="add-to-cart-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="size" id="selected-size" value="">
+                  <div class="input-group" style="width: 140px;">
+                    <span class="input-group-text bg-white border-dark text-uppercase fw-bold" style="font-size: 0.8rem;">Qty</span>
+                    <input type="number" name="quantity" id="qty-input" class="form-control border-dark text-center fw-bold" value="1" min="1" max="{{ product.stock }}">
+                  </div>
+                  <button type="submit" class="btn btn-black btn-lg text-uppercase hvr-sweep-to-right px-5 flex-grow-1" style="color: white !important;">🛒 Add to Cart</button>
+                </form>
+
+                <!-- Buy Now (direct to checkout) -->
+                <form action="{% url 'buy_now' product.id %}" method="post" id="buy-now-form" class="w-100">
+                  {% csrf_token %}
+                  <input type="hidden" name="size" id="buy-now-size" value="">
+                  <input type="hidden" name="quantity" id="buy-now-qty" value="1">
+                  <button type="submit" class="btn btn-lg w-100 fw-bold text-uppercase py-3" style="background: linear-gradient(135deg, #F77F00, #D62828); color: white; border: none; border-radius: 10px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(247,127,0,0.35); transition: all 0.3s ease;">
+                    ⚡ Buy Now — Go to Checkout
+                  </button>
+                </form>
+              {% else %}
+                <button class="btn btn-secondary btn-lg text-uppercase px-5 w-100" disabled>Out of Stock</button>
+              {% endif %}
             {% else %}
-              <button class="btn btn-secondary btn-lg text-uppercase px-5 w-100" disabled>Out of Stock</button>
+              <div class="w-100 text-center p-4 bg-white border border-light rounded-4 shadow-sm">
+                <p class="text-muted fw-bold mb-3">Login to purchase this premium product</p>
+                <a href="{% url 'login_user' %}" class="btn btn-orange btn-lg text-uppercase px-5 w-100 rounded-pill">Login Now</a>
+              </div>
             {% endif %}
           </div>
+
         </div>
       </div>
     </div>
     
-    <!-- Reviews Section -->
+    <!-- Related Products Section -->
+    {% if related_products %}
+    <div class="mt-5 pt-5 border-top border-light">
+      <h3 class="display-6 fw-bold mb-4">You Might Also Like</h3>
+      <p class="text-muted mb-4 fs-5">Add these to your cart to complete your look.</p>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for item in related_products %}
+        <div class="col">
+          <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card-hover" style="position: relative;">
+            <div class="p-3 bg-white d-flex align-items-center justify-content-center" style="height: 200px;">
+              {% if item.image %}
+              <img src="{{ item.image.url }}" class="img-fluid rounded object-fit-contain h-100" alt="{{ item.name }}">
+              {% endif %}
+            </div>
+            <div class="card-body p-4 d-flex flex-column">
+              <h5 class="fw-bold mb-2 text-truncate">{{ item.name }}</h5>
+              <div class="d-flex justify-content-between align-items-center mt-auto">
+                <span class="text-success fw-bold fs-5">₹{{ item.price }}</span>
+                <form action="{% url 'addtocart' item.id %}" method="post" class="ajax-add-to-cart">
+                  {% csrf_token %}
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn-sm btn-outline-dark rounded-pill px-3 position-relative" style="z-index: 5;">Add to Cart</button>
+                </form>
+              </div>
+              <a href="{% url 'productdetails' item.id %}" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+     <!-- Reviews Section -->
     <div class="row mt-5 pt-5 border-top border-light">
       <div class="col-lg-7">
         <h3 class="display-6 fw-bold mb-4">Customer Reviews</h3>
@@ -80,7 +147,6 @@
                     <small class="text-muted">Verified Customer</small>
                   </div>
                 </div>
-                <!-- Convert text rating to stars if possible, or style the emoji nicely -->
                 <div class="bg-light px-3 py-1 rounded-pill d-flex align-items-center gap-1 shadow-sm border border-light">
                   <span class="fs-5">{{ p.rating }}</span>
                 </div>
@@ -107,9 +173,9 @@
               <h4 class="fw-bold mb-0 text-white">Write a Review</h4>
             </div>
             
+            {% if user.is_authenticated %}
             <form action="{% url 'add_review' product.id %}" method="post">
               {% csrf_token %}
-              
               <div class="mb-4">
                 <label class="form-label text-uppercase fw-bold text-white-50" style="font-size: 0.8em; letter-spacing: 1px;">Rating</label>
                 <div class="position-relative">
@@ -122,21 +188,155 @@
                   </select>
                 </div>
               </div>
-              
               <div class="mb-4">
                 <label class="form-label text-uppercase fw-bold text-white-50" style="font-size: 0.8em; letter-spacing: 1px;">Your Comment</label>
                 <textarea name="comment" class="form-control form-control-lg border-0 bg-white shadow-sm rounded-3" rows="4" placeholder="Share your experience with this product..." required></textarea>
               </div>
-              
               <button type="submit" class="btn btn-primary btn-lg w-100 py-3 text-uppercase fw-bold shadow-sm rounded-3" style="letter-spacing: 1px;">Submit Review</button>
             </form>
+            {% else %}
+            <div class="text-center py-4">
+              <p class="text-white-50 mb-4 fs-5">Sign in to share your experience with this footwear.</p>
+              <a href="{% url 'login_user' %}" class="btn btn-outline-light btn-lg w-100 rounded-3 text-uppercase fw-bold" style="letter-spacing: 1px;">Login to Review</a>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
     </div>
-    
   </div>
 </section>
+
+<!-- Toast for Feedback -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+  <div id="cartToast" class="toast align-items-center text-white bg-dark border-0 rounded-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex p-3">
+      <div class="toast-body fs-6 fw-semibold d-flex align-items-center gap-2">
+        <span class="fs-4">🛒</span> <span id="toastMessage">Product added to cart!</span>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="px-3 pb-3">
+      <a href="{% url 'cartitems' %}" class="btn btn-sm btn-primary w-100 rounded-pill">View Cart & Checkout</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-card-hover {
+    transition: all 0.3s ease;
+  }
+  .product-card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+  }
+  .ajax-add-to-cart {
+    position: relative;
+    z-index: 10;
+  }
+</style>
+
+<script>
+// Size selection logic
+document.addEventListener('DOMContentLoaded', function() {
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    const sizeInput = document.getElementById('selected-size');
+    const buyNowSizeInput = document.getElementById('buy-now-size');
+    const sizeWarning = document.getElementById('size-warning');
+    const addToCartForm = document.getElementById('add-to-cart-form');
+    const buyNowForm = document.getElementById('buy-now-form');
+    const qtyInput = document.getElementById('qty-input');
+    const buyNowQtyInput = document.getElementById('buy-now-qty');
+
+    // Sync quantity to buy-now form whenever qty changes
+    if (qtyInput && buyNowQtyInput) {
+        qtyInput.addEventListener('input', function() {
+            buyNowQtyInput.value = this.value;
+        });
+    }
+
+    sizeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Toggle active style
+            sizeButtons.forEach(b => {
+                b.classList.remove('btn-dark');
+                b.classList.add('btn-outline-dark');
+            });
+            this.classList.remove('btn-outline-dark');
+            this.classList.add('btn-dark');
+            const selectedSize = this.getAttribute('data-size');
+            // Update both form hidden inputs
+            if (sizeInput) sizeInput.value = selectedSize;
+            if (buyNowSizeInput) buyNowSizeInput.value = selectedSize;
+            if (sizeWarning) sizeWarning.style.display = 'none';
+        });
+    });
+
+    // Prevent Add to Cart submit without size
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function(e) {
+            if (!sizeInput || !sizeInput.value) {
+                e.preventDefault();
+                if (sizeWarning) sizeWarning.style.display = 'block';
+                document.getElementById('size-options').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+
+    // Prevent Buy Now submit without size
+    if (buyNowForm) {
+        buyNowForm.addEventListener('submit', function(e) {
+            if (!buyNowSizeInput || !buyNowSizeInput.value) {
+                e.preventDefault();
+                if (sizeWarning) sizeWarning.style.display = 'block';
+                document.getElementById('size-options').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartForms = document.querySelectorAll('form[action*="addtocart"]');
+    const toastElement = document.getElementById('cartToast');
+    const toastMessage = document.getElementById('toastMessage');
+    const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+
+    addToCartForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('action');
+            const formData = new FormData(this);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    if (confirm('Please login first to add this product to your cart.')) {
+                        window.location.href = "{% url 'login_user' %}";
+                    }
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.status === 'success') {
+                    toastMessage.textContent = `${data.product_name} added to cart!`;
+                    toast.show();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+</script>
 
 {% if messages %}
   {% for msg in messages %}

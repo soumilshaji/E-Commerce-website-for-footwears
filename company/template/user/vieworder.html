@@ -2,78 +2,161 @@
 {% load static %}
 
 {% block content %}
-<section class="py-5 bg-light my-5">
+<section class="py-5 bg-light my-5" style="min-height: 80vh;">
   <div class="container-lg">
     <div class="row align-items-center mb-5">
       <div class="col-md-6">
-        <h2 class="display-6 fw-bold mb-0">Your Orders</h2>
+        <h2 class="display-6 fw-bold mb-1">Your Orders</h2>
+        <p class="text-muted fs-5 mb-0">Track, manage, and view your recent purchases.</p>
       </div>
-      <div class="col-md-6 text-md-end mt-3 mt-md-0">
-        <a href="{% url 'cartitems' %}" class="btn btn-outline-gray text-uppercase px-4">Back to Cart</a>
+      <div class="col-md-6 text-md-end mt-4 mt-md-0 d-flex justify-content-md-end gap-3 flex-wrap">
+        {% if orders %}
+        <button type="button" class="btn btn-outline-danger text-uppercase rounded-pill px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+          <i class="fas fa-trash-alt me-2"></i> Clear History
+        </button>
+        {% endif %}
+        <a href="{% url 'userhome' %}" class="btn btn-outline-theme text-uppercase rounded-pill px-4 py-2 fw-bold"><i class="fas fa-shopping-bag me-2"></i> Continue Shopping</a>
       </div>
     </div>
     
     <div class="row">
-      <div class="col-12">
-        <div class="card shadow-sm border-0 rounded-4">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light text-muted">
-                  <tr>
-                    <th scope="col" class="py-3 ps-4 text-uppercase fw-bold" style="font-size: 0.85em;">Product</th>
-                    <th scope="col" class="py-3 text-uppercase fw-bold" style="font-size: 0.85em;">Price</th>
-                    <th scope="col" class="py-3 text-uppercase fw-bold text-center" style="font-size: 0.85em;">Qty</th>
-                    <th scope="col" class="py-3 text-uppercase fw-bold" style="font-size: 0.85em;">Total</th>
-                    <th scope="col" class="py-3 pe-4 text-uppercase fw-bold text-end" style="font-size: 0.85em;">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% regroup orders by order as order_groups %}
-                  {% for group in order_groups %}
-                  <tr class="bg-light">
-                    <td colspan="5" class="py-3 px-4 border-bottom border-top">
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                          <span class="text-muted fw-bold me-2" style="font-size: 0.85em;">ORDER #{{ group.grouper.id|stringformat:"06d" }}</span>
-                          <span class="badge bg-secondary">{{ group.grouper.orderdate|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-4">
-                          <span class="fw-bold text-dark fs-5">Total: ₹{{ group.grouper.total_amount }}</span>
-                          <a href="{% url 'orderdetails' group.grouper.id %}" class="btn btn-dark btn-sm text-uppercase px-4 py-2 rounded-pill fw-bold">View Order Details</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+      {% regroup orders by order as order_groups %}
+      {% for group in order_groups %}
+      <div class="col-12 mb-4">
+        
+        <!-- Order Card -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden position-relative" style="transition: transform 0.2s ease;">
+          
+          <!-- Card Header (Order Meta) -->
+          <div class="card-header bg-white border-bottom p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+              <div class="d-flex align-items-center gap-3 mb-1">
+                <h5 class="fw-bold mb-0">Order #{{ group.grouper.id|stringformat:"06d" }}</h5>
+                {% if group.grouper.orderstatus|lower == 'completed' %}
+                  <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 border border-success"><i class="fas fa-check-circle me-1"></i> Delivered</span>
+                {% elif group.grouper.orderstatus|lower == 'canceled' %}
+                  <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 border border-danger"><i class="fas fa-times-circle me-1"></i> Cancelled</span>
+                {% else %}
+                  <span class="badge badge-theme rounded-pill px-3 py-2"><i class="fas fa-truck me-1"></i> {{ group.grouper.orderstatus|title|default:"Processing" }}</span>
+                {% endif %}
+              </div>
+              <small class="text-muted fw-semibold"><i class="far fa-calendar-alt me-1"></i> Placed on {{ group.grouper.orderdate|date:"F d, Y" }}</small>
+            </div>
+            
+            <div class="text-md-end bg-light p-3 border rounded-3">
+              <span class="d-block text-muted small fw-bold text-uppercase mb-1" style="letter-spacing: 1px;">Total Amount</span>
+              <span class="fs-4 fw-bold text-dark">₹{{ group.grouper.total_amount }}</span>
+            </div>
+          </div>
+          
+          <!-- Card Body (Items & Actions) -->
+          <div class="card-body p-0 {% if group.grouper.orderstatus|lower == 'canceled' or group.grouper.orderstatus|lower == 'completed' %}bg-light opacity-75{% endif %}">
+            <div class="row g-0">
+              
+              <!-- Items List -->
+              <div class="col-md-9 border-end">
+                <ul class="list-group list-group-flush">
                   {% for i in group.list %}
-                  <tr class="border-bottom">
-                    <td class="ps-4 py-3">
+                  <li class="list-group-item p-4 d-flex align-items-center border-0 {% if not forloop.last %}border-bottom{% endif %} bg-transparent">
+                    <div class="bg-white rounded p-2 me-4 border shadow-sm" style="width: 80px; height: 80px;">
+                      <img src="{{ i.product.image.url }}" class="w-100 h-100 object-fit-contain mix-blend-multiply" alt="{{ i.product.name }}">
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="fw-bold mb-1 fs-5 text-dark">{{ i.product.name }}</h6>
                       <div class="d-flex align-items-center gap-3">
-                        <img src="{{ i.product.image.url }}" class="rounded bg-white object-fit-cover shadow-sm p-1 border" width="60" height="60" alt="{{ i.product.name }}">
-                        <div>
-                          <h6 class="mb-0 fw-bold" style="font-size: 0.95em;">{{ i.product.name }}</h6>
-                        </div>
+                        <span class="text-muted fw-semibold"><i class="fas fa-tag me-1"></i> ₹{{ i.product.price }}</span>
+                        <span class="badge bg-secondary rounded-pill">Qty: {{ i.quantity }}</span>
+                        {% if i.size %}<span class="badge bg-dark rounded-pill">{{ i.size }}</span>{% endif %}
                       </div>
-                    </td>
-                    <td class="fw-semibold text-muted">₹{{ i.product.price }}</td>
-                    <td class="text-center fw-semibold">{{ i.quantity }}</td>
-                    <td class="fw-bold text-black" colspan="2">₹{{ i.total }}</td>
-                  </tr>
+                    </div>
+                  </li>
                   {% endfor %}
-                  {% empty %}
-                  <tr>
-                    <td colspan="5" class="text-center py-5">
-                      <h5 class="text-muted fw-normal mb-0">No orders found.</h5>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+                </ul>
+              </div>
+              
+              <!-- Actions Area -->
+              <div class="col-md-3 d-flex flex-column justify-content-center align-items-center p-4 bg-transparent">
+                <a href="{% url 'orderdetails' group.grouper.id %}" class="btn btn-theme rounded-pill fw-bold w-100 py-3 shadow-sm mb-3 text-uppercase">
+                  View Details <i class="fas fa-chevron-right ms-2 small"></i>
+                </a>
+                
+                {% if group.grouper.orderstatus|lower == 'canceled' %}
+                  <div class="text-center w-100 p-2 bg-danger bg-opacity-10 rounded-3">
+                    <small class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-1"></i> Order was cancelled</small>
+                  </div>
+                {% elif group.grouper.orderstatus|lower == 'completed' %}
+                   <div class="text-center w-100 p-2 bg-success bg-opacity-10 rounded-3">
+                    <small class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Order fulfilled</small>
+                  </div>
+                {% endif %}
+              </div>
+              
             </div>
           </div>
         </div>
       </div>
+      
+      {% empty %}
+      <!-- Empty State -->
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+          <div class="card-body py-5">
+            <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-4" style="width: 120px; height: 120px;">
+              <i class="fas fa-box-open fa-4x text-muted opacity-50"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-3">No orders found</h3>
+            <p class="text-muted mb-4 fs-5">Looks like you haven't made any purchases yet.</p>
+            <a href="{% url 'userhome' %}" class="btn btn-theme text-uppercase rounded-pill px-5 py-3 fw-bold shadow-sm">Start Shopping Now</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      
     </div>
   </div>
 </section>
+
+<!-- Add some custom hover flair inside the block -->
+<style>
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+  .bg-theme { background-color: var(--primary-orange) !important; color: white !important;}
+  .text-theme { color: var(--primary-orange) !important; }
+  .btn-theme { background-color: var(--primary-orange); border-color: var(--primary-orange); color: white; transition: all 0.3s; }
+  .btn-theme:hover { background-color: var(--hero-orange); border-color: var(--hero-orange); color: white; }
+  .btn-outline-theme { border-color: var(--primary-orange); color: var(--primary-orange); transition: all 0.3s; }
+  .btn-outline-theme:hover { background-color: var(--primary-orange); color: white; }
+  .badge-theme { background-color: rgba(255, 102, 0, 0.1) !important; color: var(--primary-orange) !important; border: 1px solid var(--primary-orange) !important; }
+</style>
+
+<!-- Clear History Confirmation Modal -->
+<div class="modal fade" id="clearHistoryModal" tabindex="-1" aria-labelledby="clearHistoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header bg-danger text-white border-bottom-0 p-4">
+        <h5 class="modal-title fw-bold" id="clearHistoryModalLabel"><i class="fas fa-trash-alt me-2"></i>Clear Order History</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-5 text-center bg-white">
+        <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-4" style="width: 80px; height: 80px;">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">Are you sure?</h5>
+        <p class="text-muted mb-0">This will permanently delete <strong>all your order history</strong>. This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer bg-light border-top-0 p-3 d-flex gap-3 justify-content-center">
+        <button type="button" class="btn btn-secondary rounded-pill px-5 fw-bold" data-bs-dismiss="modal">Cancel</button>
+        <form action="{% url 'clear_order_history' %}" method="post" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger rounded-pill px-5 fw-bold shadow-sm">
+            <i class="fas fa-trash-alt me-2"></i>Yes, Clear All
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

@@ -1,196 +1,343 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Orders</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+{% extends 'common/base.html' %}
+{% load static %}
 
-        .table-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1000px;
-            text-align: center;
-        }
+{% block content %}
+<style>
+    /* Premium Orange Brand Theme */
+    :root {
+        --brand-orange: #ff6b00;
+        --brand-orange-hover: #e65c00;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-hover: rgba(255, 255, 255, 0.15);
+    }
 
-        .table-container h2 {
-            margin-bottom: 25px;
-            color: #333;
-            text-transform: uppercase;
-        }
+    .orders-wrapper {
+        background: linear-gradient(rgba(15, 15, 15, 0.85), rgba(15, 15, 15, 0.85)), url("{% static 'stylish-1.0.0/images/card-image1.jpg' %}") no-repeat center center;
+        background-size: cover;
+        background-attachment: fixed;
+        padding: 50px 20px;
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        font-family: 'Inter', 'Roboto', sans-serif;
+    }
 
-        .filter-group {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    .orders-card {
+        background: rgba(30, 30, 30, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        width: 100%;
+        max-width: 1200px;
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        animation: fadeIn 0.6s ease-out;
+    }
 
-        .filter-btn {
-            display: inline-block;
-            padding: 8px 15px;
-            background: #e9ecef;
-            color: #333;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .filter-btn:hover {
-            background: #d3d9df;
-        }
+    .orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
 
-        .filter-btn.active {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
+    .orders-card h2 {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, #fff, #bbb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-        }
+    .filter-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            vertical-align: middle;
-        }
+    .filter-btn {
+        padding: 10px 20px;
+        background: var(--glass-bg);
+        color: #ccc;
+        text-decoration: none;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--glass-border);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
+    .filter-btn:hover {
+        background: var(--glass-hover);
+        color: #fff;
+        transform: translateY(-2px);
+    }
 
-        tr:hover {
-            background-color: #f1f1f1;
-        }
+    .filter-btn.active {
+        background: var(--brand-orange);
+        color: #fff;
+        border-color: var(--brand-orange-hover);
+        box-shadow: 0 8px 16px rgba(255, 107, 0, 0.4);
+    }
 
-        .action-link {
-            display: inline-block;
-            padding: 6px 12px;
-            margin: 0 4px;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 13px;
-        }
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+    }
 
-        .btn-details { background-color: #17a2b8; }
-        .btn-details:hover { background-color: #138496; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
 
-        .btn-cancel { background-color: #dc3545; }
-        .btn-cancel:hover { background-color: #c82333; }
+    th, td {
+        padding: 18px 25px;
+        text-align: left;
+        border-bottom: 1px solid var(--glass-border);
+    }
 
-        .btn-complete { background-color: #28a745; }
-        .btn-complete:hover { background-color: #218838; }
+    th {
+        background: rgba(255, 255, 255, 0.03);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 13px;
+        color: #aaa;
+        letter-spacing: 1px;
+    }
 
-        .status-text {
-            font-weight: bold;
-            color: #6c757d;
-            text-transform: capitalize;
-        }
+    tr {
+        transition: background 0.3s;
+    }
 
-        .btn-back {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #333;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 15px;
-            transition: background 0.3s;
-        }
+    tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
 
-        .btn-back:hover {
-            background: #555;
-        }
-    </style>
-</head>
-<body>
+    tr:last-child td {
+        border-bottom: none;
+    }
 
-    <div class="table-container">
-        <h2>User Orders</h2>
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-        <div class="filter-group">
-            <a href="?status=pending" class="filter-btn">Pending</a>
-            <a href="?status=Processing" class="filter-btn">Processing</a>
-            <a href="?status=Completed" class="filter-btn">Completed</a>
-            <a href="?status=Canceled" class="filter-btn">Cancelled</a>
-            <a href="?status=all" class="filter-btn">All Orders</a>
+    .status-pending { background: rgba(234, 179, 8, 0.2); color: #fdf08a; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .status-processing { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .status-completed { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .status-canceled { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    .action-group {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-details {
+        background: var(--glass-bg);
+        color: #fff;
+        border-color: var(--glass-border);
+    }
+    .btn-details:hover {
+        background: var(--glass-hover);
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        background: rgba(239, 68, 68, 0.1);
+        color: #fca5a5;
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    .btn-cancel:hover {
+        background: rgba(239, 68, 68, 0.3);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .btn-complete {
+        background: rgba(34, 197, 94, 0.1);
+        color: #86efac;
+        border-color: rgba(34, 197, 94, 0.3);
+    }
+    .btn-complete:hover {
+        background: rgba(34, 197, 94, 0.3);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 30px;
+        padding: 12px 24px;
+        background: var(--glass-bg);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: 1px solid var(--glass-border);
+    }
+
+    .btn-back:hover {
+        background: var(--brand-orange);
+        border-color: var(--brand-orange-hover);
+        box-shadow: 0 8px 16px rgba(255, 107, 0, 0.3);
+        transform: translateX(-5px);
+    }
+
+    .empty-state {
+        padding: 50px;
+        text-align: center;
+        color: #aaa;
+    }
+</style>
+
+<div class="orders-wrapper">
+    <div class="orders-card">
+        <div class="orders-header">
+            <h2>Manage Orders</h2>
+            <div class="filter-group">
+                <a href="?status=all" class="filter-btn" data-status="all">All Orders</a>
+                <a href="?status=pending" class="filter-btn" data-status="pending">Pending</a>
+                <a href="?status=Processing" class="filter-btn" data-status="Processing">Processing</a>
+                <a href="?status=Completed" class="filter-btn" data-status="Completed">Completed</a>
+                <a href="?status=Canceled" class="filter-btn" data-status="Canceled">Cancelled</a>
+            </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Order Date</th>
-                    <th>Status</th>
-                    <th>Payment</th>
-                    <th>Amount</th>
-                    <th style="text-align: center;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in orders %}
-                <tr>
-                    <td>{{ item.user.username }}</td>
-                    <td>{{ item.orderdate }}</td>
-                    <td class="status-text">{{ item.orderstatus }}</td>
-                    <td>{{ item.payment_method }}</td>
-                    <td>${{ item.total_amount }}</td>
-                    <td style="text-align: center;">
-                        {% if item.orderstatus == 'pending' %}
-                            <a href="{% url 'orderdetails_for_manager' item.id %}" class="action-link btn-details">More Details</a>
-                        {% elif item.orderstatus == 'Processing' %}
-                            <a href="{% url 'canceled_order' item.id %}" class="action-link btn-cancel" onclick="return confirm('Cancel this order?')">Cancel</a>
-                            <a href="{% url 'completeorder' item.id %}" class="action-link btn-complete" onclick="return confirm('Mark as complete?')">Complete</a>
-                        {% else %}
-                            <span class="status-text">{{ item.orderstatus }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in orders %}
+                    <tr>
+                        <td style="font-family: monospace; color: #aaa;">#{{ item.id|stringformat:"06d" }}</td>
+                        <td style="font-weight: 600;">{{ item.user.username }}</td>
+                        <td style="color: #ccc;">{{ item.orderdate|date:"M d, Y" }}</td>
+                        <td>
+                            {% if item.orderstatus|lower == 'pending' %}
+                                <span class="status-badge status-pending">Pending</span>
+                            {% elif item.orderstatus|lower == 'processing' %}
+                                <span class="status-badge status-processing">Processing</span>
+                            {% elif item.orderstatus|lower == 'completed' %}
+                                <span class="status-badge status-completed">Completed</span>
+                            {% elif item.orderstatus|lower == 'canceled' or item.orderstatus|lower == 'cancelled' %}
+                                <span class="status-badge status-canceled">Canceled</span>
+                            {% else %}
+                                <span class="status-badge" style="background: rgba(255,255,255,0.1);">{{ item.orderstatus }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="color: #ccc; text-transform: capitalize;">{{ item.payment_method }}</td>
+                        <td style="font-weight: 700; color: #fff;">${{ item.total_amount }}</td>
+                        <td>
+                            <div class="action-group">
+                                {% if item.orderstatus == 'pending' %}
+                                    <a href="{% url 'orderdetails_for_manager' item.id %}" class="btn-action btn-details">Review Details</a>
+                                {% elif item.orderstatus == 'Processing' %}
+                                    <a href="{% url 'completeorder' item.id %}" class="btn-action btn-complete" onclick="return confirm('Mark this order as complete?')">Complete</a>
+                                    <a href="{% url 'canceled_order' item.id %}" class="btn-action btn-cancel" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel</a>
+                                {% elif item.orderstatus|lower == 'canceled' or item.orderstatus|lower == 'cancelled' %}
+                                    {% if item.payment_method|lower == 'upi' %}
+                                        <span style="color: #fca5a5; font-size: 12px; font-weight: 600;">Fund has to refund</span>
+                                    {% else %}
+                                        <span style="color: #aaa; font-size: 12px; font-weight: 500;">No fund to refund (COD)</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: #aaa; font-style: italic; font-size: 12px;">No actions</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 15px; opacity: 0.5;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                </svg>
+                                <div>No orders found matching the selected filter.</div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         
-        <a href="{% url 'adminhome' %}" class="btn-back">&larr; Back to Admin Home</a>
+        <a href="{% url 'adminhome' %}" class="btn-back">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back to Dashboard
+        </a>
     </div>
+</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let status = urlParams.get('status') || 'all';
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let status = urlParams.get('status');
+        
+        if (!status) status = 'all';
 
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (btn.href.includes(status)) {
-                    btn.classList.add('active');
-                }
-            });
+        // Set the active class on the current filter button based on status
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            if (btn.getAttribute('data-status').toLowerCase() === status.toLowerCase()) {
+                btn.classList.add('active');
+            }
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}
