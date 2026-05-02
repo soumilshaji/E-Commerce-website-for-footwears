@@ -146,6 +146,42 @@
         padding: 0;
       }
     }
+
+    /* Mobile Preview Mode Styles */
+    body.mobile-preview-mode {
+      max-width: 414px !important;
+      margin: 0 auto !important;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      position: relative;
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-color: #fff;
+    }
+    html.mobile-preview-mode-html {
+      background-color: #e5e7eb;
+    }
+    /* Enforce Bootstrap mobile grid behavior when in preview mode */
+    body.mobile-preview-mode .col-lg-3, 
+    body.mobile-preview-mode .col-md-4, 
+    body.mobile-preview-mode .col-md-6 {
+      flex: 0 0 auto !important;
+      width: 100% !important;
+    }
+    body.mobile-preview-mode .d-none.d-md-block,
+    body.mobile-preview-mode .d-lg-block {
+      display: none !important;
+    }
+    body.mobile-preview-mode .navbar-toggler {
+      display: flex !important;
+    }
+    body.mobile-preview-mode .offcanvas-end {
+      width: 300px;
+    }
+    body.mobile-preview-mode .container-lg, 
+    body.mobile-preview-mode .container {
+      padding-left: 15px !important;
+      padding-right: 15px !important;
+    }
   </style>
 </head>
 
@@ -224,6 +260,9 @@
     <symbol xmlns="http://www.w3.org/2000/svg" id="search" viewBox="0 0 24 24">
       <path fill="currentColor"
         d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396l1.414-1.414l-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8s3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6s-6-2.691-6-6s2.691-6 6-6z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="mobile-phone" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z"/>
     </symbol>
   </svg>
   <!-- Loader 4 -->
@@ -393,6 +432,12 @@
           </div>
         </div>
         <div class="user-items ps-0 ps-md-5 d-flex align-items-center gap-3">
+          <!-- Mobile View Toggle -->
+          <button id="mobile-view-toggle" class="btn btn-link user-icon-circle d-none d-md-flex" title="Toggle Mobile View" style="border:none; padding:0;">
+            <svg class="mobile-phone" width="20" height="20">
+              <use xlink:href="#mobile-phone"></use>
+            </svg>
+          </button>
           {% if user.is_authenticated %}
             {% if not user.is_staff %}
             {# Customer icons: logout, profile, cart #}
@@ -625,6 +670,19 @@
 
       // Handle window resize to keep pill aligned
       window.addEventListener('resize', updateActivePill);
+
+      // Mobile View Toggle Logic
+      const mobileToggle = document.getElementById('mobile-view-toggle');
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.body.classList.toggle('mobile-preview-mode');
+          document.documentElement.classList.toggle('mobile-preview-mode-html');
+          
+          // Trigger a resize event so other scripts adjust
+          window.dispatchEvent(new Event('resize'));
+        });
+      }
     });
   </script>
 
